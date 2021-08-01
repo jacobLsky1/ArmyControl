@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/personnelTab"
+        android:title="חיילים"
+        android:icon="@drawable/ic_personnel" />
+
+    <item android:id="@+id/placeHolder"
+        android:title=""/>
+
+    <item android:id="@+id/timeLineTab"
+        android:title="ציר הזמן"
+        android:icon="@drawable/ic_time_line" />
+
+</menu>

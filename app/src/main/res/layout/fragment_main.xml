@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:fabCradleMargin="20dp"
+        app:fabCradleRoundedCornerRadius="20dp">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationMenu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            app:menu="@menu/bottom_menu_army_control"/>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add_24"
+        app:layout_anchor="@id/bottomAppBar"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_soldier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible"
+        app:layout_anchorGravity="center_horizontal"
+        app:layout_anchor="@id/bottomAppBar"
+        app:srcCompat="@drawable/ic_solider_24" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible"
+        app:layout_anchorGravity="center_horizontal"
+        app:layout_anchor="@id/bottomAppBar"
+        app:srcCompat="@drawable/ic_add_activity" />
+
+    <TextView
+        android:id="@+id/fab_add_soldierTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="  הוסף חייל  "
+        android:visibility="gone"
+        android:background="@drawable/button_shape_gray"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/fab_add_activityTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="  הוסף פעילות  "
+        android:visibility="gone"
+        android:background="@drawable/button_shape_gray"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <androidx.fragment.app.FragmentTabHost
+        android:id="@+id/secondary_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="640dp" />
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
