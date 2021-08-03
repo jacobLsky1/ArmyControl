@@ -61,14 +61,14 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks,va
     }
 
     fun setUpObservers() {
-        viewModel.allSoldiers.observe(viewLifecycleOwner, Observer {
+        viewModel.listOfPersonalSoldiers.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 when (numberSelected) {
                     1 -> {
                         all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(it, callbacks, soldierSelectedCallbacks)
                     }
                     2 -> {
-                        all_soldiers_RV.adapter = SoldiersCommandersAdapter(viewModel.allCommanders, callbacks, soldierSelectedCallbacks)
+                        all_soldiers_RV.adapter = SoldiersCommandersAdapter(viewModel.listOfUserCommanders, callbacks, soldierSelectedCallbacks)
                     }
                     3 -> {
                         all_soldiers_RV.adapter = SoldiersPowerListAdapter(viewModel.listOfSoldiersWithPower, callbacks, soldierSelectedCallbacks)
@@ -85,16 +85,16 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks,va
     fun onBackPressed(){
         when (numberSelected) {
             1 -> {
-                all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(viewModel.allSoldiers.value!!, callbacks, soldierSelectedCallbacks)
+                all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(viewModel.listOfPersonalSoldiers.value!!, callbacks, soldierSelectedCallbacks)
             }
             2 -> {
-                all_soldiers_RV.adapter = SoldiersCommandersAdapter(viewModel.allCommanders, callbacks, soldierSelectedCallbacks)
+                all_soldiers_RV.adapter = SoldiersCommandersAdapter(viewModel.listOfUserCommanders, callbacks, soldierSelectedCallbacks)
             }
             3 -> {
                 all_soldiers_RV.adapter = SoldiersPowerListAdapter(viewModel.listOfSoldiersWithPower, callbacks, soldierSelectedCallbacks)
             }
             4 -> {
-                all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(viewModel.allSoldiers.value!!, callbacks, soldierSelectedCallbacks)
+                all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(viewModel.listOfPersonalSoldiers.value!!, callbacks, soldierSelectedCallbacks)
             }
         }
     }

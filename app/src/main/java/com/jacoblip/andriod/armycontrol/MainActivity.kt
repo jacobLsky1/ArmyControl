@@ -27,13 +27,14 @@ class MainActivity : AppCompatActivity()
     lateinit var fragment: Fragment
     lateinit var removeButton: Button
     var listOfSoldiersSelected = mutableListOf<Soldier>()
+    var commandPath = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         removeButton = findViewById(R.id.deleteSoldierButton)
         var intent = intent
-        var commandPath = intent.getStringExtra("commandPath")
+        commandPath = intent.getStringExtra("commandPath").toString()
         Realm.init(this)
         var realmConfiguration = RealmConfiguration.Builder().deleteRealmIfMigrationNeeded().build()
         Realm.setDefaultConfiguration(realmConfiguration)
@@ -55,6 +56,11 @@ class MainActivity : AppCompatActivity()
                 removeButton.visibility = View.VISIBLE
             }else{
                 removeButton.visibility = View.GONE
+            }
+        })
+        viewModel.listOfAllSoldiers.observe(this, Observer {
+            if(it!=null){
+                viewModel.updateLists(it.soldiers,commandPath)
             }
         })
     }

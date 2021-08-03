@@ -2,168 +2,159 @@
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.database.*
 import com.jacoblip.andriod.armycontrol.data.models.Group
+import com.jacoblip.andriod.armycontrol.data.models.ListOfSoldiers
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
-import com.jacoblip.andriod.armycontrol.utilities.Util
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
-class MainViewModel(private val repository: Repository, var context: Context):ViewModel() {
+ class MainViewModel(private val repository: Repository, var context: Context):ViewModel() {
 
-
-    var userGroup:MutableLiveData<Group> = MutableLiveData()
-    var biggestGroup:MutableLiveData<Group> = MutableLiveData()
-    var allSoldiers:MutableLiveData<List<Soldier>> = MutableLiveData()
-    var allCommanders:List<Soldier> = listOf()
-    var listOfSoldiersWithPower:List<Soldier> = listOf()
-    var userPosition:String = ""
-    var refrence = FirebaseDatabase.getInstance().getReference("פלוגה").child("ב")
+    private var groupReference = FirebaseDatabase.getInstance().getReference("פלוגה").child("ב")
+    private var soldiersReference = groupReference.child("חיילים")
     var currentFragment:Fragment? = null
 
-    fun getBiggestGroup(){
+    private var _listOfAllSoldiers = MutableLiveData<ListOfSoldiers>()
+    var listOfAllSoldiers : LiveData<ListOfSoldiers> = _listOfAllSoldiers
+
+    private var _listOfPersonalSoldiers = MutableLiveData<List<Soldier>>(listOf())
+    var listOfPersonalSoldiers:LiveData<List<Soldier>> = _listOfPersonalSoldiers
+
+    private var _listOfPersonalSoldiersForSoldier = MutableLiveData<List<Soldier>>()
+    var listOfPersonalSoldiersForSoldier:LiveData<List<Soldier>> = _listOfPersonalSoldiersForSoldier
+
+    private var _userGroup = MutableLiveData<Group>()
+    var userGroup:LiveData<Group> = _userGroup
+     var biggestGroup:Group? = null
+
+    var listOfSoldiersWithPower:List<Soldier> = listOf()
+    var listOfUserCommanders:List<Soldier> = listOf()
+
+     init {
+        getAllSoldiers()
+         getBigGroup(groupReference)
+     }
+
+    private fun getAllSoldiers(){
         val menuListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                biggestGroup.postValue(dataSnapshot.getValue(Group::class.java))
+                _listOfAllSoldiers.postValue(dataSnapshot.getValue(ListOfSoldiers::class.java))
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // handle error
             }
         }
-        refrence.addValueEventListener(menuListener)
+        soldiersReference.addValueEventListener(menuListener)
     }
 
-    fun getGroupOfSoldiers(position:String){
-        var group :Group? = biggestGroup.value
-        userPosition = position
-        val positionList = position.split('.')
-        if(group!=null) {
-            for (i in 1..positionList.lastIndex) {
-                var num = positionList[i].toInt()
-                group = group!!.subGroups!![num]
-            }
-            userGroup.postValue(group)
-        }
-    }
+     fun updateLists(allSoldiers:List<Soldier>,commandPath: String){
+         var position = commandPathToArray(commandPath)
+         var listOfSoldiersForGroup = mutableListOf<Soldier>()
+         for (soldier in allSoldiers){
+             var soldierPosition = commandPathToArray(soldier.stationMap)
+             var commanderLastIndex = position[position.lastIndex].toInt()
+             if(soldierPosition.size>=position.size&&position[commanderLastIndex]==soldierPosition[commanderLastIndex]){
+                 listOfSoldiersForGroup.add(soldier)
+             }
+         }
+         _listOfPersonalSoldiers.postValue(listOfSoldiersForGroup.toList())
+         var commanders = mutableListOf<Soldier>()
+         var powers = mutableListOf<Soldier>()
+         listOfSoldiersForGroup.forEach {
+             if(it.isCommander){
+                commanders.add(it)
+             }
+             if(it.usage!=""){
+                 powers.add(it)
+             }
+         }
+         listOfUserCommanders = commanders
+         listOfSoldiersWithPower = powers
+     }
 
-    fun getAllSoldiersFromGroup(group: Group){
-        var bigListOfSoldiers = getAllSoilders(group).toList()
-        var listOfSoldiersId = mutableListOf<String>()
-        var listOfSoldiers = mutableListOf<Soldier>()
-        for (soldier in bigListOfSoldiers){
-            if (!listOfSoldiersId.contains(soldier.idNumber)) {
-                listOfSoldiersId.add(soldier.idNumber)
-                listOfSoldiers.add(soldier)
+    fun getDirectSoldiersForSoldier(commandPath: String){
+        var position = commandPathToArray(commandPath)
+        var directSoldiers = mutableListOf<Soldier>()
+        var userSoldiers  = listOfPersonalSoldiers.value
+        if(userSoldiers!=null) {
+            when (position.size) {
+                1 -> {
+                   userSoldiers.forEach { soldier->
+                       if(soldier.usage.length==3)
+                           directSoldiers.add(soldier)
+                   }
+                }
+                2 -> {
+                    userSoldiers.forEach { soldier->
+                        if(soldier.usage.length==4||(soldier.usage.length==5))
+                            directSoldiers.add(soldier)
+                    }
+                }
+                3 -> {
+                    userSoldiers.forEach { soldier->
+                        var map = commandPathToArray(soldier.stationMap)
+                        if(soldier.usage.isEmpty()&&map[map.lastIndex]==position[position.lastIndex])
+                            directSoldiers.add(soldier)
+                    }
+                }
             }
         }
-        allSoldiers.postValue(listOfSoldiers)
-        updateLists(listOfSoldiers)
-    }
-
-    fun updateLists(soldiers:List<Soldier>){
-        var commanders:MutableList<Soldier> = mutableListOf()
-        var powers:MutableList<Soldier> = mutableListOf()
-        for(soldier in soldiers){
-            if(soldier.isCommander){
-                commanders.add(soldier)
-            }
-            if(!soldier.isCommander&&soldier.usage!=""){
-                powers.add(soldier)
-            }
-        }
-        allCommanders =commanders.toList()
-        listOfSoldiersWithPower = powers.toList()
-    }
-
-    fun getAllSoilders(group:Group):MutableList<Soldier>{
-        var listOfSoldier:MutableList<Soldier> = mutableListOf()
-        if(group.commander!=null) {
-            if (!listOfSoldier.contains(group.commander!!)) {
-                group.commander?.let { listOfSoldier.add(it) }
-            }
-        }
-        if(group.backUpCommander!=null) {
-            if (!listOfSoldier.contains(group.backUpCommander!!)) {
-                group.backUpCommander?.let { listOfSoldier.add(it) }
-            }
-        }
-        listOfSoldier.addAll(group.listOfDirectSoldiers)
-        if(group.subGroups!=null){
-            for(group in group.subGroups!!){
-                listOfSoldier.addAll(getAllSoilders(group))
-            }
-        }
-        return listOfSoldier
-    }
-
-    fun getRefByPosition(listPosition:List<String>):DatabaseReference{
-        var ref = Util.refrences
-        for(i in 1 until listPosition.size){
-            var num = listPosition[i].toInt()
-            ref = ref!!.listOfChildRefrences!![num]
-        }
-        return ref.refrences!!
+        _listOfPersonalSoldiersForSoldier.postValue(directSoldiers.toList())
     }
 
     fun addSoldier(soldier: Soldier){
-        var groups = mutableListOf<Group>()
-        var refs = mutableListOf<DatabaseReference>()
-        groups.add(biggestGroup.value!!)
-        refs.add(Util.refrences.refrences!!)
-        var listPosition = soldier.stationMap.split('.')
-        if(listPosition.size==2){
-            var num = listPosition[1].toInt()
-            var subGroup = groups[0].subGroups!![num]
-            var subReference = Util.refrences.listOfChildRefrences!![num].refrences
-            groups.add(subGroup)
-            refs.add(subReference!!)
+        var allSoldiers = listOfAllSoldiers.value?.soldiers?.toMutableList()
+        allSoldiers?.add(soldier)
+        soldiersReference.setValue(allSoldiers).addOnSuccessListener {
+            Log.i("Repository","added soldier")
+            var position = commandPathToArray(soldier.stationMap)
+            increaceNumber(position)
         }
-        if(listPosition.size==3){
-            var num1 = listPosition[1].toInt()
-            var num2 = listPosition[2].toInt()
-            var subGroup = groups[0].subGroups!![num1]
-            var subsubGroup = groups[0].subGroups!![num1].subGroups!![num2]
-            var subRef =  Util.refrences.listOfChildRefrences!![num1]
-            var subsubRef = subRef.listOfChildRefrences!![num2]
-            groups.add(subGroup)
-            groups.add(subsubGroup)
-            refs.add(subRef!!.refrences!!)
-            refs.add(subsubRef!!.refrences!!)
-        }
-      repository.addSoldier(soldier,groups,refs)
     }
 
+     fun increaceNumber(position:List<String>){
+         when(position.size){
+             1->{biggestGroup!!.amountOfSoldiers++}
+             2->{
+                 biggestGroup!!.amountOfSoldiers++
+                 biggestGroup!!.subGroups!![position[1].toInt()].amountOfSoldiers++
+             }
+             3->{
+                 biggestGroup!!.amountOfSoldiers++
+                 biggestGroup!!.subGroups!![position[1].toInt()].amountOfSoldiers++
+                 biggestGroup!!.subGroups!![position[1].toInt()].subGroups!![position[2].toInt()].amountOfSoldiers++
+             }
+         }
+         groupReference.setValue(biggestGroup)
+     }
+     fun decreaseNumber(position:List<String>){
+         when(position.size){
+             1->{biggestGroup!!.amountOfSoldiers--}
+             2->{
+                 biggestGroup!!.amountOfSoldiers--
+                 biggestGroup!!.subGroups!![position[1].toInt()].amountOfSoldiers--
+             }
+             3->{
+                 biggestGroup!!.amountOfSoldiers++
+                 biggestGroup!!.subGroups!![position[1].toInt()].amountOfSoldiers--
+                 biggestGroup!!.subGroups!![position[1].toInt()].subGroups!![position[2].toInt()].amountOfSoldiers--
+             }
+         }
+         groupReference.setValue(biggestGroup)
+     }
+
     fun removeSoldier(soldier: Soldier){
-        var groups = mutableListOf<Group>()
-        var refs = mutableListOf<DatabaseReference>()
-        groups.add(biggestGroup.value!!)
-        refs.add(Util.refrences.refrences!!)
-        var listPosition = soldier.stationMap.split('.')
-        if(listPosition.size==2){
-            var num = listPosition[1].toInt()
-            var subGroup = groups[0].subGroups!![num]
-            var subReference = Util.refrences.listOfChildRefrences!![num].refrences
-            groups.add(subGroup)
-            refs.add(subReference!!)
+        var allSoldiers = listOfAllSoldiers.value?.soldiers?.toMutableList()
+        allSoldiers?.remove(soldier)
+        soldiersReference.setValue(allSoldiers).addOnSuccessListener {
+            Log.i("Repository","added soldier")
+            var position = commandPathToArray(soldier.stationMap)
+            decreaseNumber(position)
         }
-        if(listPosition.size==3){
-            var num1 = listPosition[1].toInt()
-            var num2 = listPosition[2].toInt()
-            var subGroup = groups[0].subGroups!![num1]
-            var subsubGroup = groups[0].subGroups!![num1].subGroups!![num2]
-            var subRef =  Util.refrences.listOfChildRefrences!![num1]
-            var subsubRef = subRef.listOfChildRefrences!![num2]
-            groups.add(subGroup)
-            groups.add(subsubGroup)
-            refs.add(subRef!!.refrences!!)
-            refs.add(subsubRef!!.refrences!!)
-        }
-        repository.removeSoldier(soldier,groups,refs)
     }
 
     fun deleteSoldiers(soldiers: List<Soldier>){
@@ -171,5 +162,36 @@ class MainViewModel(private val repository: Repository, var context: Context):Vi
            removeSoldier(soldier)
         }
     }
+
+    fun getUserGroup(commandPath:String){
+        var position = commandPathToArray(commandPath)
+        var group:Group? = biggestGroup
+        if(position.size>1){
+            for(i in 1..position.lastIndex){
+               group = group?.subGroups?.get(position[i].toInt())
+            }
+        }
+        _userGroup.postValue(group)
+    }
+
+
+     private fun getBigGroup(reference:DatabaseReference){
+         val menuListener = object : ValueEventListener {
+             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                 biggestGroup = dataSnapshot.getValue(Group::class.java)
+             }
+
+             override fun onCancelled(databaseError: DatabaseError) {
+                 // handle error
+             }
+         }
+         reference.addValueEventListener(menuListener)
+     }
+
+     private fun commandPathToArray(commandPath: String): List<String> = commandPath.split('.')
+
+     fun resetSoldiersForSoldier(){
+         _listOfPersonalSoldiersForSoldier.postValue(null)
+     }
 
 }

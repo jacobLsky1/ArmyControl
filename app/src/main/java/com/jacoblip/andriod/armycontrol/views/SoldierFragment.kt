@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.Switch
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +27,7 @@ class SoldierFragment(soldier: Soldier,callBacks: MainSoldiersFragment.SoldierCa
     val soldier = soldier
     val callBacks = callBacks
     var callBacks2 = callBacks2
+    var directSoldiersOfSoldier:List<Soldier> = listOf()
 
     lateinit var editSoldierButton: Button
     lateinit var soldierName:TextView
@@ -49,15 +51,26 @@ class SoldierFragment(soldier: Soldier,callBacks: MainSoldiersFragment.SoldierCa
     ): View? {
         viewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
         viewModel.currentFragment = this
+        viewModel.getDirectSoldiersForSoldier(soldier.stationMap)
         val view= inflater.inflate(R.layout.fragment_soilder,container,false)
         setUpViews(view)
         setFragment()
+        setUpObservers()
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpRecyclerViews()
+    }
+
+    fun setUpObservers(){
+        viewModel.listOfPersonalSoldiersForSoldier.observe(viewLifecycleOwner, Observer {
+            if(it!=null){
+                directSoldiersOfSoldier = it
+                directSoldiersRV.adapter = SoldiersAllSoldiersAdapter(directSoldiersOfSoldier, callBacks,callBacks2)
+            }
+        })
     }
 
     fun setFragment(){
@@ -75,7 +88,6 @@ class SoldierFragment(soldier: Soldier,callBacks: MainSoldiersFragment.SoldierCa
         soldierActivityRV.layoutManager = LinearLayoutManager(requireContext())
         datesOfServiceRV.layoutManager =  LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
 
-        directSoldiersRV.adapter = SoldiersAllSoldiersAdapter(soldier.listOfDirectSoldiers, callBacks,callBacks2)
         soldierActivityRV.adapter = ArmyActivityAdapter(listOf())
         datesOfServiceRV.adapter = DateOfServiceAdapter(listOf())
 
@@ -83,7 +95,7 @@ class SoldierFragment(soldier: Soldier,callBacks: MainSoldiersFragment.SoldierCa
     }
 
     fun onBackPressed(){
-        directSoldiersRV.adapter = SoldiersAllSoldiersAdapter(soldier.listOfDirectSoldiers, callBacks,callBacks2)
+        directSoldiersRV.adapter = SoldiersAllSoldiersAdapter(directSoldiersOfSoldier, callBacks,callBacks2)
     }
 
 
@@ -104,6 +116,11 @@ class SoldierFragment(soldier: Soldier,callBacks: MainSoldiersFragment.SoldierCa
             soldierActivityRV = findViewById(R.id.completedActivities_RV)
 
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.resetSoldiersForSoldier()
     }
 
     companion object{

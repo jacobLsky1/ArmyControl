@@ -15,7 +15,6 @@ data class Soldier(
     var usage:String = "",
     var stationMap:String = "",
     var isCommander:Boolean = false,
-    var listOfDirectSoldiers:List<Soldier> = listOf(),
     var ActivatesPassed:List<ArmyActivity> = listOf()
 ) {
 }

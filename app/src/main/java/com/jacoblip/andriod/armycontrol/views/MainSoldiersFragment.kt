@@ -94,10 +94,11 @@ class MainSoldiersFragment(var commandPath:String):Fragment() {
             powerListButton.setOnClickListener { buttonCallbacks!!.onButtonSelectedSelected(3,soldierCallbacks!!) }
             operationalListButton.setOnClickListener { buttonCallbacks!!.onButtonSelectedSelected(4,soldierCallbacks!!) }
         }
-        if (commandPath != "") {
-            viewModel.getBiggestGroup()
 
-        }
+        viewModel.getUserGroup(commandPath)
+        //viewModel.getPersonalSoldiers(commandPath)
+
+
     }
 
     fun updateUI(){
@@ -107,21 +108,15 @@ class MainSoldiersFragment(var commandPath:String):Fragment() {
 
     fun setUpObservers(){
 
-        viewModel.biggestGroup.observe(viewLifecycleOwner, Observer {
-            if(it!=null){
-                viewModel.getGroupOfSoldiers(commandPath)
-            }
-        })
         viewModel.userGroup.observe(viewLifecycleOwner, Observer { it ->
             if(it!=null){
                 group = it
-                viewModel.getAllSoldiersFromGroup(it)
                 updateUI()
             }
         })
-        viewModel.allSoldiers.observe(viewLifecycleOwner, Observer { it ->
+        viewModel.listOfAllSoldiers.observe(viewLifecycleOwner, Observer { it ->
             if(it!=null){
-                listOfAllSoldiers = it
+                listOfAllSoldiers = it.soldiers
                 updateUI()
             }
         })

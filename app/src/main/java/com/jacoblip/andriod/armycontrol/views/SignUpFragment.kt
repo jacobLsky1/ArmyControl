@@ -198,6 +198,10 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
 
 
     fun initData(){
+        val soldierDbRef = FirebaseDatabase.getInstance().getReference("חיילים")
+        soldierDbRef.setValue(ArmyData.listOfSoldiers)
+
+
         val dbRef = FirebaseDatabase.getInstance().getReference("פלוגה")
         dbRef.child("ב").setValue(ArmyData.armyData)
                         .addOnCompleteListener {task ->

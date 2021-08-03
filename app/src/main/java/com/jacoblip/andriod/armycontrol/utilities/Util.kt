@@ -1,9 +1,6 @@
 package com.jacoblip.andriod.armycontrol.utilities
 
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.jacoblip.andriod.armycontrol.data.models.Refrences
 
 class Util {
     companion object{
@@ -11,27 +8,6 @@ class Util {
         var inSelectionMode :MutableLiveData<Boolean> = MutableLiveData(false)
         var addFABY = 0F
 
-        val group = FirebaseDatabase.getInstance().getReference("פלוגה").child("ב")
-        val group0 = group.child("subGroups").child("0")
-        val group1 = group.child("subGroups").child("1")
-        val group2 = group.child("subGroups").child("2")
-        val group3 = group.child("subGroups").child("3")
-        val group00 = group0.child("subGroups").child("0")
-        val group01 = group0.child("subGroups").child("1")
-        val group02 = group0.child("subGroups").child("2")
-        val group10 = group1.child("subGroups").child("0")
-        val group11 = group1.child("subGroups").child("1")
-        val group12 = group1.child("subGroups").child("2")
-        val group20 = group2.child("subGroups").child("0")
-        val group21 = group2.child("subGroups").child("1")
-        val group22 = group2.child("subGroups").child("2")
-
-        var refrences = Refrences(group, listOf(
-                Refrences(group0, listOf(Refrences(group00,null),Refrences(group01,null),Refrences(group02,null))),
-                Refrences(group1, listOf(Refrences(group10,null),Refrences(group11,null),Refrences(group12,null))),
-                Refrences(group2, listOf(Refrences(group20,null),Refrences(group21,null),Refrences(group22,null))),
-                Refrences(group3,null)
-        ))
 
         var hasInternet:MutableLiveData<Boolean> = MutableLiveData(true)
 

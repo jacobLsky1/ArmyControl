@@ -88,7 +88,7 @@ class AddSoldierFragment():Fragment() {
             var soldierPosition = Util.getSoldierArmyPosition(position)
             var isCommander = (armyJob!="")
             var soldier = Soldier(name,idNumber,0,"",false,"", listOf(),phone,job,armyJob,
-                    soldierPosition,isCommander, listOf(), listOf() )
+                    soldierPosition,isCommander, listOf() )
 
             viewModel.addSoldier(soldier)
             requireActivity().supportFragmentManager.popBackStack()
