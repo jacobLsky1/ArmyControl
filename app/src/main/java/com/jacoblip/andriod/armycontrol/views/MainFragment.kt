@@ -17,8 +17,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jacoblip.andriod.armycontrol.R
-import com.jacoblip.andriod.armycontrol.data.sevices.MainViewModel
+import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.utilities.Util
+import com.jacoblip.andriod.armycontrol.views.activities.MainActivitiesFragment
+import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
 
 class MainFragment(var commandPath:String):Fragment() {
 
@@ -26,14 +28,15 @@ class MainFragment(var commandPath:String):Fragment() {
     lateinit var addFAB:FloatingActionButton
     lateinit var addSoldierFAB:FloatingActionButton
     lateinit var addActivityFAB:FloatingActionButton
-    lateinit var childFragment: Fragment
+    var soldiersFragment:Fragment = MainSoldiersFragment.newInstance(commandPath)
+    var activiteiesFragment:Fragment = MainActivitiesFragment.newInstance(commandPath)
     var fragmentReady:MutableLiveData<Boolean> = MutableLiveData()
     var fabClicked:Boolean = false
     var addSoldierY : Float = 0F
     var addActivityY : Float = 0F
     lateinit var addSoldierTV:TextView
     lateinit var addActivityTV:TextView
-    lateinit var viewModel:MainViewModel
+    lateinit var soldiersViewModel:SoldiersViewModel
 
     private val rotateOpenAnim:Animation by lazy { AnimationUtils.loadAnimation(requireContext(),R.anim.rotate_open_anim) }
     private val rotateCloseAnim:Animation by lazy { AnimationUtils.loadAnimation(requireContext(),R.anim.rotate_close_anim) }
@@ -59,7 +62,7 @@ class MainFragment(var commandPath:String):Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
+        soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
        val view = inflater.inflate(R.layout.fragment_main,container,false)
         view.apply {
             addFAB = findViewById(R.id.fab)
@@ -70,18 +73,29 @@ class MainFragment(var commandPath:String):Fragment() {
             bottomNavigationView = findViewById(R.id.bottomNavigationMenu)
             bottomNavigationView.background = null
             bottomNavigationView.menu.getItem(1).isEnabled = false
+
+            bottomNavigationView.setOnNavigationItemSelectedListener {
+                when(it.itemId){
+                    R.id.personnelTab->{
+                        setFragment(soldiersFragment)
+                    }
+                    R.id.timeLineTab->{
+                        setFragment(activiteiesFragment)
+                    }
+                }
+                true
+            }
         }
         setUpObservers()
-        setFragment()
+        setFragment(soldiersFragment)
         return view
     }
 
-    fun setFragment(){
-        // TODO: 7/4/2021 get current fragment from view model
-        childFragment = MainSoldiersFragment.newInstance(commandPath)
+    fun setFragment(fragment: Fragment){
+
         childFragmentManager
             .beginTransaction()
-            .replace(R.id.secondary_fragment_container,childFragment)
+            .replace(R.id.secondary_fragment_container,fragment)
             .commit()
     }
     fun setUpObservers(){

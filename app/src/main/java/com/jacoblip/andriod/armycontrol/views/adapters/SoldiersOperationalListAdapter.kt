@@ -5,10 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
-import com.jacoblip.andriod.armycontrol.views.MainSoldiersFragment
-import com.jacoblip.andriod.armycontrol.views.RVSoldiersFragment
+import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
 
-class SoldiersOperationalListAdapter(var soldiers:List<Soldier>,var callbacks: MainSoldiersFragment.SoldierCallbacks,var callBacks2:RVSoldiersFragment.SoldierSelectedFromRV?):RecyclerView.Adapter<SoldierItemViewHolder>() {
+class SoldiersOperationalListAdapter(var soldiers:List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks, var callBacks2: MainSoldiersFragment.SoldierSelectedFromRV?):RecyclerView.Adapter<SoldierItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoldierItemViewHolder {
         when(viewType){
         }

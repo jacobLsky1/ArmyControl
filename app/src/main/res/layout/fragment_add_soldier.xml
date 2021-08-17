@@ -94,7 +94,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
-        android:id="@+id/soldierFragmentSoldierIsCommander"
+        android:id="@+id/SoldierIsCommanderSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -105,7 +105,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
 
     <TextView
-        android:id="@+id/soldierFragmentArmyJobAndPosition"
+        android:id="@+id/editTextArmyJobAndPosition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -113,25 +113,25 @@
         android:text="מיקום בפלוגה"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/soldierFragmentSoldierIsCommander" />
+        app:layout_constraintTop_toBottomOf="@+id/SoldierIsCommanderSwitch" />
 
     <Spinner
         android:id="@+id/spinnerArmyJob"
         android:layout_width="200dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/soldierFragmentSoldierIsCommander"
+        app:layout_constraintBottom_toBottomOf="@+id/SoldierIsCommanderSwitch"
         app:layout_constraintEnd_toEndOf="@+id/spinnerPosition"
         app:layout_constraintStart_toStartOf="@+id/spinnerPosition"
-        app:layout_constraintTop_toTopOf="@+id/soldierFragmentSoldierIsCommander" />
+        app:layout_constraintTop_toTopOf="@+id/SoldierIsCommanderSwitch" />
 
     <Spinner
         android:id="@+id/spinnerPosition"
         android:layout_width="200dp"
         android:layout_height="0dp"
         android:layout_marginStart="30dp"
-        app:layout_constraintBottom_toBottomOf="@+id/soldierFragmentArmyJobAndPosition"
-        app:layout_constraintStart_toEndOf="@+id/soldierFragmentArmyJobAndPosition"
-        app:layout_constraintTop_toTopOf="@+id/soldierFragmentArmyJobAndPosition" />
+        app:layout_constraintBottom_toBottomOf="@+id/editTextArmyJobAndPosition"
+        app:layout_constraintStart_toEndOf="@+id/editTextArmyJobAndPosition"
+        app:layout_constraintTop_toTopOf="@+id/editTextArmyJobAndPosition" />
 
     <Button
         android:id="@+id/addSoldierButton"

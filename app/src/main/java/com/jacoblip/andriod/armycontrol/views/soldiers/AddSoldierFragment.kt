@@ -1,4 +1,4 @@
-package com.jacoblip.andriod.armycontrol.views
+package com.jacoblip.andriod.armycontrol.views.soldiers
 
 import android.os.Bundle
 import android.text.TextUtils
@@ -11,13 +11,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputEditText
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
-import com.jacoblip.andriod.armycontrol.data.sevices.MainViewModel
+import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.utilities.Util
-import kotlin.concurrent.fixedRateTimer
 
-class AddSoldierFragment():Fragment() {
+class AddSoldierFragment(var commandPath: String):Fragment() {
 
-    lateinit var viewModel: MainViewModel
+    lateinit var soldiersViewModel: SoldiersViewModel
     lateinit var nameInputText: TextInputEditText
     lateinit var idNumberInputText: TextInputEditText
     lateinit var phoneNumberInputText: TextInputEditText
@@ -29,8 +28,8 @@ class AddSoldierFragment():Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_add_soldier,container,false)
-        viewModel = ViewModelProvider(requireActivity()).get(MainViewModel::class.java)
-        viewModel.currentFragment = this
+        soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
+        soldiersViewModel.currentFragment = this
         view.apply {
             nameInputText = findViewById(R.id.addSoldierName)
             idNumberInputText = findViewById(R.id.addSoldierIdNumber)
@@ -53,8 +52,8 @@ class AddSoldierFragment():Fragment() {
     }
 
     fun setUpAdapters(){
-        val armyCommanderPositions = Util.armyCommandersPositions
-        val armySoldierPositions = Util.armySoldierPositions
+        val armyCommanderPositions = Util.getListOfCommanderPositions(commandPath)
+        val armySoldierPositions = Util.getListOfArmyPositions(commandPath)
         var positionSpinnerAdapter = ArrayAdapter(requireContext(),android.R.layout.simple_spinner_dropdown_item,armySoldierPositions)
         var armyJobSpinnerAdapter = ArrayAdapter(requireContext(),android.R.layout.simple_spinner_dropdown_item,armyCommanderPositions)
         positionSpinner.adapter = positionSpinnerAdapter
@@ -84,13 +83,17 @@ class AddSoldierFragment():Fragment() {
         }
 
         if(inputCorrect){
-            var armyJob = Util.getArmyCommanderPosition(armyJob)
+            var armyJob = Util.getArmyJobPosition(armyJob)
             var soldierPosition = Util.getSoldierArmyPosition(position)
             var isCommander = (armyJob!="")
-            var soldier = Soldier(name,idNumber,0,"",false,"", listOf(),phone,job,armyJob,
-                    soldierPosition,isCommander, listOf() )
+            var isLieutenant = if(isCommander){
+                armyJob[0]=='-'
+            }else false
 
-            viewModel.addSoldier(soldier)
+            var soldier = Soldier(name,idNumber,"","", false,"",
+                    listOf(),phone,job,armyJob,soldierPosition, isCommander,isLieutenant,listOf(),listOf() )
+
+            soldiersViewModel.addSoldier(soldier)
             requireActivity().supportFragmentManager.popBackStack()
         }
 
@@ -98,8 +101,8 @@ class AddSoldierFragment():Fragment() {
 
 
     companion object{
-        fun newInstance():AddSoldierFragment{
-            return AddSoldierFragment()
+        fun newInstance(commandPath:String): AddSoldierFragment {
+            return AddSoldierFragment(commandPath)
         }
     }
 }

@@ -10,24 +10,25 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
-import com.jacoblip.andriod.armycontrol.data.sevices.MainViewModel
-import com.jacoblip.andriod.armycontrol.data.sevices.Repository
-import com.jacoblip.andriod.armycontrol.data.sevices.ViewModelProviderFactory
+import com.jacoblip.andriod.armycontrol.data.sevices.*
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.utilities.WifiReceiver
 import com.jacoblip.andriod.armycontrol.views.*
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import com.jacoblip.andriod.armycontrol.views.soldiers.*
 
 class MainActivity : AppCompatActivity()
-        ,MainSoldiersFragment.ButtonCallbacks,MainSoldiersFragment.SoldierCallbacks,MainFragment.AddSoldierCallBacks,RVSoldiersFragment.SoldierSelectedFromRV {
+        , MainSoldiersFragment.ButtonCallbacks, MainSoldiersFragment.SoldierCallbacks,
+        MainFragment.AddSoldierCallBacks, MainSoldiersFragment.SoldierSelectedFromRV,
+        SoldierFragment.EditSoldierCallbacks{
 
-    lateinit var viewModel:MainViewModel
+
+    lateinit var soldiersViewModel:SoldiersViewModel
+    lateinit var activitiesViewModel:ActivitiesViewModel
     lateinit var wifiReceiver:WifiReceiver
     lateinit var fragment: Fragment
     lateinit var removeButton: Button
     var listOfSoldiersSelected = mutableListOf<Soldier>()
-    var commandPath = ""
+    var commandPath = "1"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,16 +36,26 @@ class MainActivity : AppCompatActivity()
         removeButton = findViewById(R.id.deleteSoldierButton)
         var intent = intent
         commandPath = intent.getStringExtra("commandPath").toString()
-        Realm.init(this)
-        var realmConfiguration = RealmConfiguration.Builder().deleteRealmIfMigrationNeeded().build()
-        Realm.setDefaultConfiguration(realmConfiguration)
+        Util.userCommandPath = commandPath
+
+        //Realm.init(this)
+        //var realmConfiguration = RealmConfiguration.Builder().deleteRealmIfMigrationNeeded().build()
+        //Realm.setDefaultConfiguration(realmConfiguration)
+
         val repository = Repository()
-        val viewModelProviderFactory = ViewModelProviderFactory(repository,applicationContext)
-        viewModel = ViewModelProvider(this, viewModelProviderFactory).get(MainViewModel::class.java)
+
+        val viewModelProviderFactory1 = SoldiersViewModelProviderFactory(repository,applicationContext)
+        val viewModelProviderFactory2 = ActivitiesViewModelProviderFactory(repository,applicationContext)
+
+        soldiersViewModel = ViewModelProvider(this, viewModelProviderFactory1).get(SoldiersViewModel::class.java)
+        activitiesViewModel = ViewModelProvider(this, viewModelProviderFactory2).get(ActivitiesViewModel::class.java)
+
         wifiReceiver = WifiReceiver()
         setUpObservers()
         removeButton.setOnClickListener {
-            viewModel.deleteSoldiers(listOfSoldiersSelected.toList())
+            soldiersViewModel.removeSoldiers(listOfSoldiersSelected.toList())
+            Util.inSelectionMode.postValue(false)
+            listOfSoldiersSelected = mutableListOf()
         }
         fragment = commandPath?.let { MainFragment.newInstance(it) }!!
         setFragement(fragment)
@@ -58,12 +69,8 @@ class MainActivity : AppCompatActivity()
                 removeButton.visibility = View.GONE
             }
         })
-        viewModel.listOfAllSoldiers.observe(this, Observer {
-            if(it!=null){
-                viewModel.updateLists(it.soldiers,commandPath)
-            }
-        })
     }
+
 
     fun setFragement(fragment:Fragment){
 
@@ -84,9 +91,9 @@ class MainActivity : AppCompatActivity()
         unregisterReceiver(wifiReceiver)
     }
 
-    override fun onButtonSelectedSelected(numberOfFragment: Int,soldierCallbacks: MainSoldiersFragment.SoldierCallbacks) {
+    override fun onButtonSelectedSelected(numberOfFragment: Int, soldierCallbacks: MainSoldiersFragment.SoldierCallbacks, soldierRVCallbacks: MainSoldiersFragment.SoldierSelectedFromRV) {
 
-        fragment = RVSoldiersFragment.newInstance(soldierCallbacks,numberOfFragment)
+        fragment = RVSoldiersFragment.newInstance(soldierCallbacks,numberOfFragment,soldierRVCallbacks)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.main_fragment_container, fragment)
@@ -94,8 +101,10 @@ class MainActivity : AppCompatActivity()
             .commit()
     }
 
-    override fun onSoldierSelectedSelected(soldier: Soldier, callBacks: MainSoldiersFragment.SoldierCallbacks,callBacks2:RVSoldiersFragment.SoldierSelectedFromRV?) {
-        fragment = SoldierFragment.newInstance(soldier, callBacks,callBacks2)
+    override fun onSoldierSelectedSelected(soldier: Soldier, callbacks1: MainSoldiersFragment.SoldierCallbacks, soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV?) {
+        fragment = SoldierFragment.newInstance(soldier,callbacks1,soldierSelectedCallbacks)
+        soldiersViewModel.setSoldier(soldier)
+        soldiersViewModel.soldierStack.push(soldier)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.main_fragment_container, fragment)
@@ -104,7 +113,7 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun addSoldier() {
-        fragment = AddSoldierFragment.newInstance()
+        fragment = AddSoldierFragment.newInstance(commandPath)
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.main_fragment_container, fragment)
@@ -112,7 +121,7 @@ class MainActivity : AppCompatActivity()
                 .commit()
     }
 
-    override fun onSoldierSelected(soldier: Soldier,addSoldier:Boolean) {
+    override fun onSoldierSelectedFromRV(soldier: Soldier,addSoldier:Boolean) {
             if (addSoldier) {
                 listOfSoldiersSelected.add(soldier)
             } else {
@@ -122,17 +131,28 @@ class MainActivity : AppCompatActivity()
             Util.inSelectionMode.postValue(false)
     }
 
+    override fun onEditSoldierSelected(soldier: Soldier) {
+        fragment = EditSoldierFragment.newInstance(soldier)
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.main_fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+    }
+
     override fun onBackPressed() {
+        var fragment = soldiersViewModel.currentFragment
         if(Util.inSelectionMode.value!!){
             Util.inSelectionMode.postValue(false)
-            var fragment = viewModel.currentFragment
+
             if(fragment is RVSoldiersFragment) {
                 fragment.onBackPressed()
             }
+
+        }else{
             if(fragment is SoldierFragment){
                 fragment.onBackPressed()
             }
-        }else{
             super.onBackPressed()
         }
     }

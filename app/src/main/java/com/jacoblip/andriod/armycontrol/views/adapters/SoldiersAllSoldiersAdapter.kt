@@ -9,10 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
-import com.jacoblip.andriod.armycontrol.views.MainSoldiersFragment
-import com.jacoblip.andriod.armycontrol.views.RVSoldiersFragment
+import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
 
-class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks, var soldierSelectedCallbacks: RVSoldiersFragment.SoldierSelectedFromRV?):RecyclerView.Adapter<SoldierItemViewHolder>() {
+class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks, var soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV):RecyclerView.Adapter<SoldierItemViewHolder>() {
 
     var listOfSoldiers:MutableList<Soldier> = mutableListOf()
 
@@ -38,7 +37,7 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
             setOnLongClickListener {
                 if (!Util.inSelectionMode.value!!&&!listOfSoldiers.contains(soldier)) {
                     Util.inSelectionMode.postValue(true)
-                    soldierSelectedCallbacks!!.onSoldierSelected(soldier,true)
+                    soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier,true)
                     checkedImageView.visibility = View.VISIBLE
                     listOfSoldiers.add(soldier)
                 }
@@ -48,11 +47,11 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
                 if(Util.inSelectionMode.value!!){
                     if(!listOfSoldiers.contains(soldier)) {
                         listOfSoldiers.add(soldier)
-                        soldierSelectedCallbacks!!.onSoldierSelected(soldier, true)
+                        soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier, true)
                         checkedImageView.visibility = View.VISIBLE
                     }else {
                         listOfSoldiers.remove(soldier)
-                        soldierSelectedCallbacks!!.onSoldierSelected(soldier, false)
+                        soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier, false)
                         checkedImageView.visibility = View.GONE
                     }
                 }else{

@@ -1,11 +1,10 @@
-package com.jacoblip.andriod.armycontrol.views
+package com.jacoblip.andriod.armycontrol.views.greeting
 
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -25,7 +24,6 @@ import com.google.firebase.database.ValueEventListener
 import com.jacoblip.andriod.armycontrol.MainActivity
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.utilities.ArmyData
-import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 class SignUpFragment(context: Context,var preferences: SharedPreferences,val firstLogIn:Boolean):Fragment() {
@@ -221,7 +219,7 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
     }
 
     companion object{
-        fun newInstance(context: Context,preferences: SharedPreferences,firstSignIn:Boolean):SignUpFragment{
+        fun newInstance(context: Context,preferences: SharedPreferences,firstSignIn:Boolean): SignUpFragment {
             return SignUpFragment(context,preferences,firstSignIn)
         }
     }

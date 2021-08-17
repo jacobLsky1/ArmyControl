@@ -1,4 +1,4 @@
-package com.jacoblip.andriod.armycontrol.views
+package com.jacoblip.andriod.armycontrol.views.greeting
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -8,10 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.jacoblip.andriod.armycontrol.R
-import com.jacoblip.andriod.armycontrol.data.sevices.LogInViewModel
-import com.jacoblip.andriod.armycontrol.data.sevices.MainViewModel
 
 class GreetingsFragment(context: Context,var prefs:SharedPreferences):Fragment() {
 

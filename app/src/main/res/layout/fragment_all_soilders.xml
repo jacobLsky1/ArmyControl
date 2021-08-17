@@ -13,7 +13,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/deleteSoldiersButton" />
+        app:layout_constraintTop_toBottomOf="@+id/noSoldiersFoundTV" />
 
     <Button
         android:id="@+id/deleteSoldiersButton"
@@ -22,6 +22,18 @@
         android:text="מחק חיילים"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/allSoldiers_RV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/noSoldiersFoundTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="לא נמצאו חיילים"
+        android:textSize="36sp"
+        android:gravity="center"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

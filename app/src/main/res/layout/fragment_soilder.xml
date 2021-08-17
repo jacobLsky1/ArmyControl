@@ -17,7 +17,7 @@
         app:srcCompat="@drawable/ic_solider_24" />
 
     <TextView
-        android:id="@+id/soldierFragmentSoldierName"
+        android:id="@+id/editTextSoldierName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -27,7 +27,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
     <TextView
-        android:id="@+id/soldierFragmentSoldierIdNumber"
+        android:id="@+id/editTextSoldierIdNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -37,40 +37,40 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
     <TextView
-        android:id="@+id/soldierFragmentSoldierPhone"
+        android:id="@+id/editTextSoldierAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="phone number"
-        app:layout_constraintStart_toStartOf="@+id/soldierFragmentSoldierName"
-        app:layout_constraintTop_toBottomOf="@+id/soldierFragmentSoldierName" />
+        app:layout_constraintStart_toStartOf="@+id/editTextSoldierName"
+        app:layout_constraintTop_toBottomOf="@+id/editTextSoldierName" />
 
     <TextView
-        android:id="@+id/soldierCivilianJob"
+        android:id="@+id/editTextMedData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="civilian job"
-        app:layout_constraintEnd_toEndOf="@+id/soldierFragmentSoldierIdNumber"
-        app:layout_constraintTop_toBottomOf="@+id/soldierFragmentSoldierIdNumber" />
+        app:layout_constraintEnd_toEndOf="@+id/editTextSoldierIdNumber"
+        app:layout_constraintTop_toBottomOf="@+id/editTextSoldierIdNumber" />
 
     <TextView
-        android:id="@+id/soldierFragmentSoldierIsCommander"
+        android:id="@+id/SoldierIsCommanderSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="isCommander?"
-        app:layout_constraintStart_toStartOf="@+id/soldierFragmentSoldierPhone"
-        app:layout_constraintTop_toBottomOf="@+id/soldierFragmentSoldierPhone" />
+        app:layout_constraintStart_toStartOf="@+id/editTextSoldierAge"
+        app:layout_constraintTop_toBottomOf="@+id/editTextSoldierAge" />
 
     <TextView
-        android:id="@+id/soldierFragmentArmyJobAndPosition"
+        android:id="@+id/editTextArmyJobAndPosition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="position"
-        app:layout_constraintEnd_toEndOf="@+id/soldierCivilianJob"
-        app:layout_constraintTop_toBottomOf="@+id/soldierCivilianJob" />
+        app:layout_constraintEnd_toEndOf="@+id/editTextMedData"
+        app:layout_constraintTop_toBottomOf="@+id/editTextMedData" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/datesOfService_RV"
@@ -89,12 +89,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="ימי שירות:"
-        app:layout_constraintEnd_toEndOf="@+id/soldierFragmentArmyJobAndPosition"
-        app:layout_constraintStart_toStartOf="@+id/soldierFragmentSoldierIsCommander"
-        app:layout_constraintTop_toBottomOf="@+id/soldierFragmentSoldierIsCommander" />
+        app:layout_constraintEnd_toEndOf="@+id/editTextArmyJobAndPosition"
+        app:layout_constraintStart_toStartOf="@+id/SoldierIsCommanderSwitch"
+        app:layout_constraintTop_toBottomOf="@+id/SoldierIsCommanderSwitch" />
 
-    <Switch
-        android:id="@+id/IsArrivingSwitch"
+    <TextView
+        android:id="@+id/isArrivingSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -103,7 +103,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/datesOfService_RV" />
 
-    <Switch
+    <TextView
         android:id="@+id/hasArrivedSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
         android:layout_marginTop="10dp"
         android:text="החייל הגיע?"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/IsArrivingSwitch" />
+        app:layout_constraintTop_toBottomOf="@+id/isArrivingSwitch" />
 
     <TextView
         android:id="@+id/textView12"
@@ -120,16 +120,17 @@
         android:layout_marginTop="10dp"
         android:text="סיבה לאי הגעה:"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/IsArrivingSwitch"
+        app:layout_constraintStart_toEndOf="@+id/isArrivingSwitch"
         app:layout_constraintTop_toBottomOf="@+id/datesOfService_RV" />
 
-    <EditText
+    <TextView
         android:id="@+id/editTextWhyNotArriving"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:ems="10"
-        android:hint="סיבה"
+        android:hint="אין סיבה"
+        android:gravity="center"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/hasArrivedSwitch"
@@ -154,10 +155,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.442"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/directSoldiers_RV" />
+        app:layout_constraintTop_toBottomOf="@+id/editSoldierDirectSoldiers_RV" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/directSoldiers_RV"
+        android:id="@+id/editSoldierDirectSoldiers_RV"
         android:layout_width="0dp"
         android:layout_height="200dp"
         android:layout_marginTop="10dp"
@@ -166,7 +167,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/completedActivities_RV"
+        android:id="@+id/editSoldierCompletedActivities_RV"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="horizontal"
@@ -176,7 +177,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView15" />
 
     <Button
-        android:id="@+id/editSoldierButton"
+        android:id="@+id/saveChangesButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"

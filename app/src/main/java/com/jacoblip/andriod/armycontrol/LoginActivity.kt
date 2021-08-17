@@ -15,9 +15,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jacoblip.andriod.armycontrol.data.sevices.*
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.utilities.WifiReceiver
-import com.jacoblip.andriod.armycontrol.views.GreetingsFragment
-import com.jacoblip.andriod.armycontrol.views.SignUpFragment
-import io.realm.Realm
+import com.jacoblip.andriod.armycontrol.views.greeting.GreetingsFragment
+import com.jacoblip.andriod.armycontrol.views.greeting.SignUpFragment
 
 class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
 
@@ -36,7 +35,7 @@ class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
         viewModel = ViewModelProvider(this, viewModelProviderFactory).get(LogInViewModel::class.java)
         prefs = getSharedPreferences("armyControl", Context.MODE_PRIVATE)
         //
-        prefs.edit().putString("ArmyControlVerified", "").apply()
+        // prefs.edit().putString("ArmyControlVerified", "").apply()
         //
         setUpInternetObserver()
         //seeIfLoggedIn()
