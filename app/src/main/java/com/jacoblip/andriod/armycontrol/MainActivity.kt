@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.m_activity_main)
         removeButton = findViewById(R.id.deleteSoldierButton)
         var intent = intent
         commandPath = intent.getStringExtra("commandPath").toString()
@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity()
             .beginTransaction()
             .replace(R.id.main_fragment_container, fragment)
             .commit()
+
 
     }
 

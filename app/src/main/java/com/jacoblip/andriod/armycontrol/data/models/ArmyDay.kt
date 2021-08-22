@@ -4,7 +4,7 @@ import java.util.*
 
 data class  ArmyDay(
     var date:String = "",
-    var activities:List<ArmyActivity>,
-    var amountOfSoldiers:Int = 0
+    var activities:List<ArmyActivity> = listOf(),
+    var amountOfSoldiers:List<Soldier> = listOf()
 ) {
 }

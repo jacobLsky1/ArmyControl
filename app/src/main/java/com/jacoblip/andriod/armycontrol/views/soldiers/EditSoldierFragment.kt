@@ -22,6 +22,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
     lateinit var soldiersViewModel: SoldiersViewModel
     var oldSoldier = soldier
     var isCommander:MutableLiveData<Boolean> = MutableLiveData(soldier.isCommander)
+    var listOfUsages:MutableList<String> = mutableListOf()
 
     lateinit var saveChangesButton: Button
     lateinit var soldierNameET:EditText
@@ -34,25 +35,36 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
     lateinit var positionSpinner: Spinner
     lateinit var isCommanderSwitch: Switch
     lateinit var editServiceDateButton: Button
-    lateinit var editUsageButton:Button
     lateinit var hasSoldierArrivedSwitch: Switch
     lateinit var whyNotArrivingET:EditText
-    lateinit var directSoldiersRV:RecyclerView
     lateinit var activitiesRV:RecyclerView
     lateinit var serviceDatesRv:RecyclerView
-    lateinit var usageRV :TextView
-    lateinit var editSoldierFAB:FloatingActionButton
+    lateinit var usageTV :TextView
     lateinit var editActivityFAB:FloatingActionButton
+
+    lateinit var checkBox1:CheckBox
+    lateinit var checkBox2:CheckBox
+    lateinit var checkBox3:CheckBox
+    lateinit var checkBox4:CheckBox
+    lateinit var checkBox5:CheckBox
+    lateinit var checkBox6:CheckBox
+    lateinit var checkBox7:CheckBox
+    lateinit var checkBox8:CheckBox
+    lateinit var checkBox9:CheckBox
+    lateinit var checkBox10:CheckBox
+    lateinit var checkBox11:CheckBox
+    lateinit var checkBox12:CheckBox
+
+    lateinit var listOfCheckBoxs:List<CheckBox>
 
     var listOfDatesOfService :List<Date> = listOf()
     var listOfSoldierActivities :List<ArmyActivity> = listOf()
-    var listOfUsage:List<String> = listOf()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
         soldiersViewModel.currentFragment = this
-        val view= inflater.inflate(R.layout.fragment_edit_soldier,container,false)
+        val view= inflater.inflate(R.layout.s_fragment_edit_soldier,container,false)
         connectViews(view)
         return view
     }
@@ -75,6 +87,10 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
                 positionSpinner.adapter = posAdapter
             }
         })
+
+        editActivityFAB.setOnClickListener {
+
+        }
     }
 
     private fun connectViews(view: View){
@@ -89,16 +105,28 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
             armyJobSpinner = findViewById(R.id.editSoldierSpinnerJob)
             positionSpinner = findViewById(R.id.editSoldierSpinner2)
             isCommanderSwitch = findViewById(R.id.SoldierIsCommanderSwitch)
-            editUsageButton = findViewById(R.id.editSoldierEditUsageButton)
             editServiceDateButton = findViewById(R.id.editSoldierEditServiceDates)
             hasSoldierArrivedSwitch = findViewById(R.id.hasArrivedSwitch)
             whyNotArrivingET = findViewById(R.id.editTextWhyNotArriving)
-            directSoldiersRV = findViewById(R.id.editSoldierDirectSoldiers_RV)
             activitiesRV = findViewById(R.id.editSoldierCompletedActivities_RV)
             serviceDatesRv = findViewById(R.id.datesOfServiceRV)
-            usageRV = findViewById(R.id.soldierUsageTV)
-            editSoldierFAB = findViewById(R.id.editSoldierAddSoldierFAB)
+            usageTV= findViewById(R.id.soldierUsageTV)
             editActivityFAB = findViewById(R.id.editSoldierAddActivityFAB)
+            checkBox1 = findViewById(R.id.checkBox1)
+            checkBox2 = findViewById(R.id.checkBox2)
+            checkBox3 = findViewById(R.id.checkBox3)
+            checkBox4 = findViewById(R.id.checkBox4)
+            checkBox5 = findViewById(R.id.checkBox5)
+            checkBox6 = findViewById(R.id.checkBox6)
+            checkBox7 = findViewById(R.id.checkBox7)
+            checkBox8 = findViewById(R.id.checkBox8)
+            checkBox9 = findViewById(R.id.checkBox9)
+            checkBox10 = findViewById(R.id.checkBox10)
+            checkBox11 = findViewById(R.id.checkBox11)
+            checkBox12 = findViewById(R.id.checkBox12)
+            listOfCheckBoxs = listOf<CheckBox>(checkBox1,checkBox2,checkBox3,checkBox4,checkBox5,checkBox6,checkBox7,checkBox8,checkBox9,checkBox10,checkBox11,checkBox12)
+
+            listOfUsages = soldier.pakal.toMutableList()
         }
 
     }
@@ -111,8 +139,39 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         soldierAgeET.setText(soldier.age)
         soldierMedData.setText(soldier.medicalProblems)
         whyNotArrivingET.setText(soldier.whyNotArriving)
-        usageRV.text = soldier.pakal.toString()
+        usageTV.text = "תפקידים:${soldier.pakal}"
         isCommanderSwitch.isChecked = soldier.isCommander
+
+        setUpCheckBoxs()
+
+
+    }
+
+    fun setUpCheckBoxs(){
+        var armyUsages = Util.armyJobs
+        for(i in listOfCheckBoxs.indices){
+            listOfCheckBoxs[i].text = armyUsages[i]
+
+            if(listOfUsages.contains(listOfCheckBoxs[i].text))
+                listOfCheckBoxs[i].isChecked = true
+
+            listOfCheckBoxs[i].setOnCheckedChangeListener { checkBox, isChecked ->
+                updateUsages(checkBox?.text.toString(), isChecked)
+            }
+        }
+    }
+
+    fun updateUsages(usage:String,add:Boolean){
+        if(add){
+            listOfUsages.add(usage)
+        }else{
+            listOfUsages.remove(usage)
+        }
+        editUsageTV(listOfUsages.toList())
+    }
+
+    fun editUsageTV(usages:List<String>){
+        usageTV.text = "תפקידים:${usages}"
     }
 
     fun setClickEvents(){
@@ -131,9 +190,6 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         isCommanderSwitch.setOnCheckedChangeListener{_,isChecked -> isCommander.postValue(isChecked) }
 
         editServiceDateButton.setOnClickListener {
-
-        }
-        editUsageButton.setOnClickListener {
 
         }
         editActivityFAB.setOnClickListener {
@@ -160,7 +216,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         return true
     }
 
-    fun makeNewSoldier():Soldier{
+    fun makeNewSoldier():Soldier {
         var name = soldierNameET.text.toString()
         var idNum = soldierIdNumberET.text.toString()
         var phone = soldierPhoneNumberET.text.toString()
@@ -174,14 +230,14 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         var soldierPosition = Util.getSoldierArmyPosition(posMap)
         var hasArrived = hasSoldierArrivedSwitch.isChecked
         var whyNotArv = whyNotArrivingET.text.toString()
-        var isLieutenant = if(isCommander){
-            armyJob[0]=='-'
-        }else false
+        var isLieutenant = if (isCommander) {
+            armyJob[0] == '-'
+        } else false
 
-        if(job.isEmpty()) job = "לא עודכן"
+        if (job.isEmpty()) job = "לא עודכן"
 
 
-        return Soldier(name,idNum,age,medData,hasArrived,whyNotArv,listOfDatesOfService,phone,job,armyJob,soldierPosition,isCommander,isLieutenant,listOfUsage,listOfSoldierActivities)
+        return Soldier(name, idNum, age, medData, hasArrived, whyNotArv, listOfDatesOfService, phone, job, armyJob, soldierPosition, isCommander, isLieutenant, listOfUsages.toList(), listOfSoldierActivities)
     }
 
 

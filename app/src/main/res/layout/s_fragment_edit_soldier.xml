@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/isCommanderTV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_solider_24" />
+
+        <EditText
+            android:id="@+id/editTextSoldierName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:hint="שם ושם משפחה"
+            android:textSize="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+
+        <EditText
+            android:id="@+id/editTextSoldierIdNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:hint="מספר אישי"
+            android:textSize="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+
+        <EditText
+            android:id="@+id/editTextSoldierAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="גיל"
+            android:textSize="12dp"
+            app:layout_constraintStart_toStartOf="@+id/editTextSoldierPhone"
+            app:layout_constraintTop_toBottomOf="@+id/editTextSoldierPhone" />
+
+        <EditText
+            android:id="@+id/editTextSoldierPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="מספר טלפון"
+            android:textSize="12dp"
+            app:layout_constraintStart_toStartOf="@+id/editTextSoldierName"
+            app:layout_constraintTop_toBottomOf="@+id/editTextSoldierName" />
+
+        <EditText
+            android:id="@+id/editTextMedData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="מצב בריאותי"
+            android:textSize="12dp"
+            app:layout_constraintEnd_toEndOf="@+id/editTextCivilianJob"
+            app:layout_constraintTop_toBottomOf="@+id/editTextCivilianJob" />
+
+        <EditText
+            android:id="@+id/editTextCivilianJob"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="עבודה אזרחית"
+            android:textSize="12dp"
+            app:layout_constraintEnd_toEndOf="@+id/editTextSoldierIdNumber"
+            app:layout_constraintTop_toBottomOf="@+id/editTextSoldierIdNumber" />
+
+        <Switch
+            android:id="@+id/SoldierIsCommanderSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="האם מפקד?"
+            android:textSize="12dp"
+            app:layout_constraintEnd_toEndOf="@+id/editTextMedData"
+            app:layout_constraintStart_toStartOf="@+id/editTextSoldierAge"
+            app:layout_constraintTop_toBottomOf="@+id/editTextSoldierAge" />
+
+        <TextView
+            android:id="@+id/editTextArmyJobAndPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="תפקיד בפלוגה"
+            android:textSize="14dp"
+            app:layout_constraintEnd_toEndOf="@+id/editTextMedData"
+            app:layout_constraintTop_toBottomOf="@+id/SoldierIsCommanderSwitch" />
+
+        <TextView
+            android:id="@+id/editTextArmyJobAndPosition2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="מיקום  בפלוגה"
+            android:textSize="14dp"
+            app:layout_constraintEnd_toEndOf="@+id/editTextArmyJobAndPosition"
+            app:layout_constraintTop_toBottomOf="@+id/editTextArmyJobAndPosition" />
+
+        <Switch
+            android:id="@+id/hasArrivedSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="33dp"
+            android:text="החייל הגיע?"
+            app:layout_constraintBottom_toBottomOf="@+id/editTextWhyNotArriving"
+            app:layout_constraintEnd_toStartOf="@+id/editTextWhyNotArriving"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/editTextWhyNotArriving" />
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="סיבה לאי הגעה:"
+            app:layout_constraintEnd_toEndOf="@+id/editTextWhyNotArriving"
+            app:layout_constraintStart_toStartOf="@+id/editTextWhyNotArriving"
+            app:layout_constraintTop_toBottomOf="@+id/datesOfServiceRV" />
+
+        <EditText
+            android:id="@+id/editTextWhyNotArriving"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="אין סיבה"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/hasArrivedSwitch"
+            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+        <TextView
+            android:id="@+id/textView15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="פעילויות שבוצעו:"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.442"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextWhyNotArriving" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/editSoldierCompletedActivities_RV"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView15" />
+
+        <Button
+            android:id="@+id/saveChangesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="שמור שינויים"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/editSoldierAddActivityFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/editSoldierCompletedActivities_RV"
+            app:srcCompat="@drawable/ic_edit_24" />
+
+        <Spinner
+            android:id="@+id/editSoldierSpinnerJob"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintBottom_toBottomOf="@+id/editTextArmyJobAndPosition"
+            app:layout_constraintEnd_toStartOf="@+id/editTextArmyJobAndPosition"
+            app:layout_constraintTop_toTopOf="@+id/editTextArmyJobAndPosition" />
+
+        <Spinner
+            android:id="@+id/editSoldierSpinner2"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/editTextArmyJobAndPosition2"
+            app:layout_constraintEnd_toEndOf="@+id/editSoldierSpinnerJob"
+            app:layout_constraintTop_toTopOf="@+id/editTextArmyJobAndPosition2" />
+
+        <Button
+            android:id="@+id/editSoldierEditServiceDates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="עדכן ימי שירות"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.49"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox11" />
+
+        <CheckBox
+            android:id="@+id/checkBox2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox1"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox3"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox1"
+            app:layout_constraintTop_toBottomOf="@+id/soldierUsageTV" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/datesOfServiceRV"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editSoldierEditServiceDates" />
+
+        <TextView
+            android:id="@+id/soldierUsageTV"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text='פק"לים:'
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextArmyJobAndPosition2" />
+
+        <CheckBox
+            android:id="@+id/checkBox3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox2"
+            app:layout_constraintTop_toTopOf="@+id/checkBox2" />
+
+        <CheckBox
+            android:id="@+id/checkBox4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="CheckBox"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox5"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox1" />
+
+        <CheckBox
+            android:id="@+id/checkBox8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox7"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox9"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox7"
+            app:layout_constraintTop_toTopOf="@+id/checkBox7" />
+
+        <CheckBox
+            android:id="@+id/checkBox1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="CheckBox"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/soldierUsageTV" />
+
+        <CheckBox
+            android:id="@+id/checkBox10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="CheckBox"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox11"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox7" />
+
+        <CheckBox
+            android:id="@+id/checkBox7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="CheckBox"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox8"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox4" />
+
+        <CheckBox
+            android:id="@+id/checkBox9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox8"
+            app:layout_constraintTop_toTopOf="@+id/checkBox8" />
+
+        <CheckBox
+            android:id="@+id/checkBox5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox4"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox6"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox4"
+            app:layout_constraintTop_toTopOf="@+id/checkBox4" />
+
+        <CheckBox
+            android:id="@+id/checkBox6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox5"
+            app:layout_constraintTop_toTopOf="@+id/checkBox5" />
+
+        <CheckBox
+            android:id="@+id/checkBox11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox10"
+            app:layout_constraintEnd_toStartOf="@+id/checkBox12"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox10"
+            app:layout_constraintTop_toTopOf="@+id/checkBox10" />
+
+        <CheckBox
+            android:id="@+id/checkBox12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox11"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/checkBox11"
+            app:layout_constraintTop_toTopOf="@+id/checkBox11" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

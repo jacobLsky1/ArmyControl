@@ -1,6 +1,9 @@
 package com.jacoblip.andriod.armycontrol.utilities
 
 import androidx.lifecycle.MutableLiveData
+import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
+import com.jacoblip.andriod.armycontrol.data.models.Soldier
+import com.jacoblip.andriod.armycontrol.views.adapters.SoldiersByDateAdapter
 
 class Util {
     companion object{
@@ -13,7 +16,7 @@ class Util {
         var hasInternet:MutableLiveData<Boolean> = MutableLiveData(true)
 
 
-        val armyJobs = arrayOf("אלפא","חובש","טיל לאו","מאג","מטול","מתשאל","נגב","נהג","צלף","קלע","קשר")
+        val armyJobs = arrayOf("אלפה","חובש","מאג","מטול","מתשאל","נגב","נהג","פקל מפקד","פקל פריצה","צלף","קלע","קשר")
 
 
         fun getListOfArmyPositions(position: String):List<String>{
@@ -155,6 +158,9 @@ class Util {
 
             return str
         }
+
+        var soldiersToAdd:MutableList<Soldier> = mutableListOf()
+        var currentDate:MutableLiveData<ArmyDay> = MutableLiveData()
     }
 
 

@@ -25,20 +25,6 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
     lateinit var noSoldiersFoundTV:TextView
 
     /*
-    interface SoldierSelectedFromRV {
-        fun onSoldierSelected(soldier: Soldier,addSoldier:Boolean)
-    }
-    var soldierSelectedCallbacks:SoldierSelectedFromRV? = null
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        soldierSelectedCallbacks = context as SoldierSelectedFromRV
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        soldierSelectedCallbacks = null
-    }
 
      */
 
@@ -49,7 +35,7 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
     ): View? {
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
         soldiersViewModel.currentFragment = this
-        val view= inflater.inflate(R.layout.fragment_all_soilders,container,false)
+        val view= inflater.inflate(R.layout.s_fragment_all_soilders,container,false)
         view.apply {
             all_soldiers_RV = findViewById(R.id.allSoldiers_RV)
             noSoldiersFoundTV = findViewById(R.id.noSoldiersFoundTV)

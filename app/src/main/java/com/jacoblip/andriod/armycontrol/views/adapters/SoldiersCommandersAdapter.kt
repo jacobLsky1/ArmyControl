@@ -12,7 +12,7 @@ class SoldiersCommandersAdapter(var soldiers: List<Soldier>, var callbacks: Main
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoldierItemViewHolder {
         when(viewType){
         }
-        return SoldierItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_soilder, parent, false))
+        return SoldierItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.s_item_soilder, parent, false))
     }
 
     override fun getItemCount() = soldiers.size

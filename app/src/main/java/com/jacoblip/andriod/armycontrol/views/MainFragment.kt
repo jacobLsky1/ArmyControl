@@ -63,7 +63,7 @@ class MainFragment(var commandPath:String):Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
-       val view = inflater.inflate(R.layout.fragment_main,container,false)
+       val view = inflater.inflate(R.layout.m_fragment_main,container,false)
         view.apply {
             addFAB = findViewById(R.id.fab)
             addSoldierFAB = findViewById(R.id.fab_add_soldier)

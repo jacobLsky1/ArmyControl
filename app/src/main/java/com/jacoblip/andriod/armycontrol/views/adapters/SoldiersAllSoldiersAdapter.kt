@@ -11,14 +11,14 @@ import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
 
-class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks, var soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV):RecyclerView.Adapter<SoldierItemViewHolder>() {
+class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks?, var soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV?):RecyclerView.Adapter<SoldierItemViewHolder>() {
 
     var listOfSoldiers:MutableList<Soldier> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoldierItemViewHolder {
         when(viewType){
         }
-        return SoldierItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_soilder, parent, false))
+        return SoldierItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.s_item_soilder, parent, false))
     }
 
     override fun getItemCount() = soldiers.size
@@ -34,28 +34,33 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
             nameTV.text = soldier.name
             idNumberTV.text = soldier.idNumber
             usageTV.text = soldier.phoneNumber
-            setOnLongClickListener {
-                if (!Util.inSelectionMode.value!!&&!listOfSoldiers.contains(soldier)) {
-                    Util.inSelectionMode.postValue(true)
-                    soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier,true)
-                    checkedImageView.visibility = View.VISIBLE
-                    listOfSoldiers.add(soldier)
-                }
-                true
-            }
-            setOnClickListener {
-                if(Util.inSelectionMode.value!!){
-                    if(!listOfSoldiers.contains(soldier)) {
-                        listOfSoldiers.add(soldier)
+
+            if(callbacks!=null&&soldierSelectedCallbacks!=null) {
+                setOnLongClickListener {
+                    if (!Util.inSelectionMode.value!! && !listOfSoldiers.contains(soldier)) {
+                        Util.inSelectionMode.postValue(true)
                         soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier, true)
                         checkedImageView.visibility = View.VISIBLE
-                    }else {
-                        listOfSoldiers.remove(soldier)
-                        soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier, false)
-                        checkedImageView.visibility = View.GONE
+                        listOfSoldiers.add(soldier)
                     }
-                }else{
-                    callbacks.onSoldierSelectedSelected(soldier, callbacks,soldierSelectedCallbacks)
+                    true
+                }
+                setOnClickListener {
+                    if (Util.inSelectionMode.value!!) {
+                        if (!listOfSoldiers.contains(soldier)) {
+                            listOfSoldiers.add(soldier)
+                            soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier, true)
+                            checkedImageView.visibility = View.VISIBLE
+                        } else {
+                            listOfSoldiers.remove(soldier)
+                            soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier, false)
+                            checkedImageView.visibility = View.GONE
+                        }
+                    } else {
+
+                        callbacks!!.onSoldierSelectedSelected(soldier, callbacks!!, soldierSelectedCallbacks
+                        )
+                    }
                 }
             }
         }

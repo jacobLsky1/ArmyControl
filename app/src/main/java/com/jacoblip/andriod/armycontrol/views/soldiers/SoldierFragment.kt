@@ -65,7 +65,7 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
         soldiersViewModel.currentFragment = this
         soldiersViewModel.getDirectSoldiersForSoldier(soldier)
-        val view= inflater.inflate(R.layout.fragment_soilder,container,false)
+        val view= inflater.inflate(R.layout.s_fragment_soilder,container,false)
         setUpViews(view)
         setUpObservers()
         return view

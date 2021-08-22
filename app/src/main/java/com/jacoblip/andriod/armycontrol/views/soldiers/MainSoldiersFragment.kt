@@ -19,6 +19,7 @@ import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Group
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
+import com.jacoblip.andriod.armycontrol.data.sevices.ActivitiesViewModel
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.views.adapters.SoldiersByDateAdapter
 
@@ -35,6 +36,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     lateinit var operationalListButton:TextView
     lateinit var powerListButton:TextView
     lateinit var soldiersViewModel: SoldiersViewModel
+    lateinit var activityViewModel:ActivitiesViewModel
     var group:Group? = null
     var listOfAllSoldiers:List<Soldier> = listOf()
 
@@ -84,8 +86,9 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
+        activityViewModel = ViewModelProvider(requireActivity()).get(ActivitiesViewModel::class.java)
         soldiersViewModel.currentFragment = this
-        val view = inflater.inflate(R.layout.fragment_main_soldiers, container, false)
+        val view = inflater.inflate(R.layout.s_fragment_main_soldiers, container, false)
         view.apply {
             groupNameTV = findViewById(R.id.groupNameTV)
             soildersByDateRV = findViewById(R.id.numberOfSoldiersByDatesRV)
@@ -94,7 +97,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
             powerListButton = findViewById(R.id.powerListButton)
             operationalListButton =    findViewById(R.id.operationalButton)
             searchView = findViewById(R.id.soldierSearchView)
-            searchList = findViewById(R.id.searchListView)
+            searchList = findViewById(R.id.activitiesSearchListView)
             searchView.queryHint = "חפש חייל";
         }
 
@@ -112,7 +115,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
                 false
             )
             // TODO: 7/5/2021 get soldiers from view model
-            soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays)
+            soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers.size)
 
             allSoldiersButton.setOnClickListener { buttonCallbacks!!.onButtonSelectedSelected(
                 1,
@@ -190,6 +193,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     }
 
     fun updateUI(){
+        soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers.size)
         groupNameTV.text = group?.groupName
         allSoldiersButton.text = "0/${group?.amountOfSoldiers}"
         setSearchView()
@@ -206,6 +210,13 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
         soldiersViewModel.listOfPersonalSoldiers.observe(viewLifecycleOwner, Observer { it ->
             if (it != null) {
                 listOfAllSoldiers = it
+                updateUI()
+            }
+        })
+
+        activityViewModel.listOfArmyDays.observe(viewLifecycleOwner, Observer {
+            if(it!=null){
+                listOfArmyDays = it as List<ArmyDay>
                 updateUI()
             }
         })

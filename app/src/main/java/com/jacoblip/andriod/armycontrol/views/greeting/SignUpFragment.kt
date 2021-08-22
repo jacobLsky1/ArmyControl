@@ -47,7 +47,7 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_sign_up,container,false)
+        val view = inflater.inflate(R.layout.m_fragment_sign_up,container,false)
         view.apply {
             submitButton = findViewById(R.id.submitButton)
             userEmail = findViewById(R.id.userEmail)

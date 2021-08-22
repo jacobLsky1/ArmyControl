@@ -28,7 +28,7 @@ class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.m_activity_login)
         wifiReceiver = WifiReceiver()
         repository = LogInRepository()
         val viewModelProviderFactory = LogInViewModelProviderFactory(repository,applicationContext)
@@ -37,6 +37,7 @@ class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
         //
         // prefs.edit().putString("ArmyControlVerified", "").apply()
         //
+
         setUpInternetObserver()
         //seeIfLoggedIn()
         fragment = GreetingsFragment.newInstance(applicationContext,prefs)

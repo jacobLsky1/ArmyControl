@@ -39,7 +39,7 @@ class GreetingsFragment(context: Context,var prefs:SharedPreferences):Fragment()
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_greetings_army_control,container,false)
+        val view = inflater.inflate(R.layout.m_fragment_greetings_army_control,container,false)
         getStartedButton = view.findViewById(R.id.getStartedButton)
         getStartedButton.setOnClickListener {
             callbacks?.onButtonSelected()
