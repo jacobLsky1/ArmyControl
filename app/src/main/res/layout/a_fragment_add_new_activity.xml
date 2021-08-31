@@ -78,7 +78,7 @@
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/activityStartTimeButton"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintTop_toBottomOf="@+id/activityDateTV" />
 
     <Button
         android:id="@+id/activityEndTimeButton"
@@ -131,38 +131,22 @@
         app:layout_constraintTop_toBottomOf="@+id/activityEndTimeButton" />
 
     <Button
-        android:id="@+id/addAllSoldiersButton"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="16dp"
-        android:text="הוסף את כל החיילים"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activityLocationET" />
-
-    <Button
         android:id="@+id/addSomeSoldiersButton"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
-        android:text="הוסף חלק מהחיילים"
+        android:text="הוסף חיילים"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addAllSoldiersButton" />
+        app:layout_constraintTop_toBottomOf="@+id/activityLocationET" />
 
-    <TextView
-        android:id="@+id/whoIsAttendingTV"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/whoIsAttendingRV"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="8dp"
-        android:gravity="center"
-        android:text="TextView"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/activityCompletedSwitch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addSomeSoldiersButton" />
@@ -177,7 +161,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/activityDateTV"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
@@ -196,7 +180,33 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
         android:text="תאריך פעילות"
-        app:layout_constraintEnd_toStartOf="@+id/textView5"
+        app:layout_constraintEnd_toStartOf="@+id/activityDateTV"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+    <Switch
+        android:id="@+id/activityCompletedSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="האם הפעילות הושלמה?"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/saveActivityButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/whoIsAttendingRV" />
+
+    <TextView
+        android:id="@+id/activityCompletedTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="TextView"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/saveActivityButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/activityCompletedSwitch"
+        app:layout_constraintTop_toBottomOf="@+id/whoIsAttendingRV" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

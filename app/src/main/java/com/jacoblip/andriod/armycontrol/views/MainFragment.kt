@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jacoblip.andriod.armycontrol.R
+import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.activities.MainActivitiesFragment
@@ -37,6 +38,7 @@ class MainFragment(var commandPath:String):Fragment() {
     lateinit var addSoldierTV:TextView
     lateinit var addActivityTV:TextView
     lateinit var soldiersViewModel:SoldiersViewModel
+    lateinit var currentFragment:Fragment
 
     private val rotateOpenAnim:Animation by lazy { AnimationUtils.loadAnimation(requireContext(),R.anim.rotate_open_anim) }
     private val rotateCloseAnim:Animation by lazy { AnimationUtils.loadAnimation(requireContext(),R.anim.rotate_close_anim) }
@@ -44,16 +46,22 @@ class MainFragment(var commandPath:String):Fragment() {
     interface AddSoldierCallBacks{
         fun addSoldier()
     }
+    interface AddActivityCallBacks{
+        fun addActivity()
+    }
     private var addSoldierCallbacks:AddSoldierCallBacks? = null
+    private var addActivityCallback:AddActivityCallBacks? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         addSoldierCallbacks = context as AddSoldierCallBacks?
+        addActivityCallback = context as AddActivityCallBacks?
     }
 
     override fun onDetach() {
         super.onDetach()
         addSoldierCallbacks = null
+        addActivityCallback = null
     }
 
 
@@ -85,6 +93,7 @@ class MainFragment(var commandPath:String):Fragment() {
                 }
                 true
             }
+            currentFragment = soldiersFragment
         }
         setUpObservers()
         setFragment(soldiersFragment)
@@ -93,10 +102,22 @@ class MainFragment(var commandPath:String):Fragment() {
 
     fun setFragment(fragment: Fragment){
 
-        childFragmentManager
-            .beginTransaction()
-            .replace(R.id.secondary_fragment_container,fragment)
-            .commit()
+        if(currentFragment == soldiersFragment && fragment== activiteiesFragment) {
+            childFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.secondary_fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+
+            currentFragment = activiteiesFragment
+        }else{
+            childFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.secondary_fragment_container, fragment)
+                    .commit()
+            currentFragment = soldiersFragment
+        }
+
     }
     fun setUpObservers(){
         fragmentReady.observe(viewLifecycleOwner, Observer {
@@ -136,7 +157,7 @@ class MainFragment(var commandPath:String):Fragment() {
             onAddFabClicked()
         }
         addActivityFAB.setOnClickListener {
-            Toast.makeText(requireContext(),"add Activity",Toast.LENGTH_SHORT).show()
+            addActivityCallback?.addActivity()
             onAddFabClicked()
         }
     }
@@ -154,6 +175,8 @@ class MainFragment(var commandPath:String):Fragment() {
         addActivityTV.y = addActivityFAB.y+20
         addActivityTV.x = addActivityFAB.x+addActivityFAB.width+25
         addSoldierTV.visibility = View.VISIBLE
+        addActivityTV.bringToFront()
+        addSoldierTV.bringToFront()
         addActivityTV.visibility = View.VISIBLE
     }
 

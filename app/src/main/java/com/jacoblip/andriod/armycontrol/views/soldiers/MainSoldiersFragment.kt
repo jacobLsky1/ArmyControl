@@ -109,11 +109,8 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.apply {
-            soildersByDateRV.layoutManager = LinearLayoutManager(
-                requireContext(),
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
+
+            soildersByDateRV.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
             // TODO: 7/5/2021 get soldiers from view model
             soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers.size)
 

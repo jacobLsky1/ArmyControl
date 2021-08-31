@@ -3,6 +3,7 @@ package com.jacoblip.andriod.armycontrol.views.adapters
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 
@@ -15,13 +16,14 @@ class DateOfServiceAdapter(var daysInService:List<String>):RecyclerView.Adapter<
     }
 
     override fun getItemCount():Int {
-       return 5
+       return daysInService.size
     }
 
     override fun onBindViewHolder(holder: ArmyDateBySoldiersItemViewHolder, position: Int) {
-
+        val day = daysInService[position]
         holder.itemView.apply {
-
+            var dateTV = findViewById<TextView>(R.id.dateOfServiceTV)
+            dateTV.text = day
         }
     }
 

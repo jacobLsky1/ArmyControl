@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.database.*
+import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
+import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Group
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
@@ -261,6 +263,42 @@ import java.util.*
          soldierStack.pop()
          soldierStack.push(newSoldier)
          _nowSoldier.postValue(soldierStack.peek())
+     }
+
+     fun getSoldierActivities(soldier: Soldier,armyDays:List<ArmyDay?>?):List<ArmyActivity>{
+         return if(armyDays!=null) {
+             val list: MutableList<ArmyActivity> = mutableListOf()
+             for (i in armyDays.indices) {
+                 val day = armyDays[i]
+                 for (j in day!!.activities.indices) {
+                     val activity = day.activities[j]
+                     if (activity.attendees.contains(soldier.idNumber))
+                         list.add(activity)
+                 }
+             }
+             list
+         }else emptyList()
+     }
+
+     fun addActivityToSoldiers(oldArmyActivity: ArmyActivity?,newArmyActivity: ArmyActivity) {
+         var allSoldiers = listOfAllSoldiers
+         for(soldier in allSoldiers!!){
+             if(newArmyActivity.attendees.contains(soldier!!.idNumber)){
+                 if(oldArmyActivity==null) {
+                     val list = soldier.Activates.toMutableList()
+                     list.add(newArmyActivity)
+                     list.sortBy { it.date }
+                     soldier.Activates = list
+                 }else{
+                     val inx = soldier.Activates.indexOf(oldArmyActivity)
+                     val list = soldier.Activates.toMutableList()
+                     list[inx] = newArmyActivity
+                     list.sortBy { it.date }
+                     soldier.Activates = list
+                 }
+             }
+         }
+         soldiersReference.setValue(allSoldiers)
      }
 
 }

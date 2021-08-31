@@ -2,7 +2,7 @@ package com.jacoblip.andriod.armycontrol.data.models
 
 import java.util.*
 
-data class Soldier(
+data class  Soldier(
         var name:String = "",
         var idNumber:String = "",
         var age:String = "",
@@ -17,6 +17,6 @@ data class Soldier(
         var isCommander:Boolean = false,
         var isLieutenant:Boolean = false,
         var pakal:List<String> = listOf(),
-        var ActivatesPassed:List<ArmyActivity> = listOf()
+        var Activates:List<ArmyActivity> = listOf()
 ) {
 }

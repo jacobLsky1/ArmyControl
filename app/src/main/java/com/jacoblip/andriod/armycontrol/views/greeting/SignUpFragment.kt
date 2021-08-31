@@ -57,6 +57,7 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
             progressBar = findViewById(R.id.progressBar)
 
             if(!firstLogIn){
+                // FIXME: 8/29/2021 make the eye disappear
                 userEmail.visibility = View.GONE
                 userEmailPassword.visibility = View.GONE
             }

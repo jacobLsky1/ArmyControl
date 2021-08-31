@@ -3,11 +3,13 @@ package com.jacoblip.andriod.armycontrol.views.adapters
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
+import com.jacoblip.andriod.armycontrol.views.activities.MainActivitiesFragment
 
-class ArmyActivityAdapter(var armyActivities:List<ArmyActivity>):RecyclerView.Adapter<ArmyDateBySoldiersItemViewHolder>() {
+class ArmyActivityAdapter(var armyActivities:List<ArmyActivity>,var callbacks:MainActivitiesFragment.OnActivityPressedCallBacks?):RecyclerView.Adapter<ArmyDateBySoldiersItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArmyDateBySoldiersItemViewHolder {
         when(viewType){
         }
@@ -16,17 +18,34 @@ class ArmyActivityAdapter(var armyActivities:List<ArmyActivity>):RecyclerView.Ad
     }
 
     override fun getItemCount():Int {
-       return 5
+       return armyActivities.size
     }
 
     override fun onBindViewHolder(holder: ArmyDateBySoldiersItemViewHolder, position: Int) {
-
+        val armyActivity = armyActivities[position]
         holder.itemView.apply {
+            var activityType = findViewById<TextView>(R.id.itemArmyActivityType)
+            var activityName = findViewById<TextView>(R.id.itemArmyActivityName)
+            var activityLocation = findViewById<TextView>(R.id.itemArmyActivityLocation)
+            var activityTime = findViewById<TextView>(R.id.itemArmyActivityStart)
+            var activityAttendees = findViewById<TextView>(R.id.itemArmyActivityAttendees)
 
+            activityType.text = armyActivity.type
+            activityName.text = armyActivity.name
+            activityLocation.text = armyActivity.location
+            activityTime.text = "${armyActivity.endTime} - ${armyActivity.startTime}"
+            activityAttendees.text = "${armyActivity.attendees.size}חיילים "
+
+            if(callbacks!=null) {
+                setOnClickListener {
+                    callbacks!!.onActivityPressed(armyActivity)
+                }
+            }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
+
         when(position){
 
         }

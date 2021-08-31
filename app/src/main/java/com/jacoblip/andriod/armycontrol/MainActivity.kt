@@ -9,17 +9,21 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.*
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.utilities.WifiReceiver
 import com.jacoblip.andriod.armycontrol.views.*
+import com.jacoblip.andriod.armycontrol.views.activities.AddOrEditNewActivityFragment
+import com.jacoblip.andriod.armycontrol.views.activities.MainActivitiesFragment
 import com.jacoblip.andriod.armycontrol.views.soldiers.*
 
 class MainActivity : AppCompatActivity()
         , MainSoldiersFragment.ButtonCallbacks, MainSoldiersFragment.SoldierCallbacks,
         MainFragment.AddSoldierCallBacks, MainSoldiersFragment.SoldierSelectedFromRV,
-        SoldierFragment.EditSoldierCallbacks{
+        SoldierFragment.EditSoldierCallbacks,MainActivitiesFragment.OnActivityPressedCallBacks,
+        MainFragment.AddActivityCallBacks{
 
 
     lateinit var soldiersViewModel:SoldiersViewModel
@@ -156,6 +160,19 @@ class MainActivity : AppCompatActivity()
             }
             super.onBackPressed()
         }
+    }
+
+    override fun onActivityPressed(activity:ArmyActivity?) {
+        fragment = AddOrEditNewActivityFragment.newInstance(activity)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.main_fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    override fun addActivity() {
+        onActivityPressed(null)
     }
 
 

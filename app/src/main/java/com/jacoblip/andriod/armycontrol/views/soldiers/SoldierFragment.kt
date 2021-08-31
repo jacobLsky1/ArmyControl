@@ -14,15 +14,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
+import com.jacoblip.andriod.armycontrol.data.sevices.ActivitiesViewModel
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.adapters.ArmyActivityAdapter
 import com.jacoblip.andriod.armycontrol.views.adapters.DateOfServiceAdapter
+import com.jacoblip.andriod.armycontrol.views.adapters.SoldierActivitiesAdapter
 import com.jacoblip.andriod.armycontrol.views.adapters.SoldiersAllSoldiersAdapter
 
 class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.SoldierCallbacks, var callBacks2: MainSoldiersFragment.SoldierSelectedFromRV?): Fragment() {
 
     lateinit var soldiersViewModel: SoldiersViewModel
+    lateinit var activitiesViewModel: ActivitiesViewModel
     var directSoldiersOfSoldier:List<Soldier> = listOf()
     var fragmentInit = false
 
@@ -63,6 +66,7 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
         savedInstanceState: Bundle?
     ): View? {
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
+        activitiesViewModel = ViewModelProvider(requireActivity()).get(ActivitiesViewModel::class.java)
         soldiersViewModel.currentFragment = this
         soldiersViewModel.getDirectSoldiersForSoldier(soldier)
         val view= inflater.inflate(R.layout.s_fragment_soilder,container,false)
@@ -114,11 +118,27 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
         directSoldiersRV.layoutManager = LinearLayoutManager(requireContext())
         soldierActivityRV.layoutManager = LinearLayoutManager(requireContext())
         datesOfServiceRV.layoutManager =  LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
+        var soldierActivities = soldiersViewModel.getSoldierActivities(soldier,activitiesViewModel.listOfArmyDays.value!!)
 
-        soldierActivityRV.adapter = ArmyActivityAdapter(listOf())
-        datesOfServiceRV.adapter = DateOfServiceAdapter(listOf())
+        soldierActivityRV.adapter = SoldierActivitiesAdapter(soldierActivities)
+        val dates = getSoldierDatesOfService()
+        datesOfServiceRV.adapter = DateOfServiceAdapter(dates)
+        (datesOfServiceRV.adapter as DateOfServiceAdapter).notifyDataSetChanged()
 
 
+    }
+
+    fun getSoldierDatesOfService():List<String>{
+        val daysOfService = activitiesViewModel.listOfArmyDays.value
+        var listOfDates = mutableListOf<String>()
+        if(daysOfService!= null){
+            for(day in daysOfService){
+                if(day?.amountOfSoldiers!!.contains(soldier)){
+                    listOfDates.add(day.date)
+                }
+            }
+        }
+        return listOfDates
     }
 
     fun onBackPressed(){

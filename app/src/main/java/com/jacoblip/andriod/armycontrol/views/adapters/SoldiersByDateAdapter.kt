@@ -1,5 +1,6 @@
 package com.jacoblip.andriod.armycontrol.views.adapters
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -22,14 +23,22 @@ class SoldiersByDateAdapter(var armyDays:List<ArmyDay>,var amountOfSoldiers:Int)
     override fun onBindViewHolder(holder: ArmyDateBySoldiersItemViewHolder, position: Int) {
         val armyDay = armyDays[position]
         holder.itemView.apply {
+            this.setBackgroundColor(resources.getColor(R.color.darkGray))
             var dateTV = findViewById<TextView>(R.id.armyDayDateTV)
             var amountOfSoldiersTV = findViewById<TextView>(R.id.amountOfSoldiersPerDayTV)
 
             dateTV.text = armyDay.date
             amountOfSoldiersTV.text = "${armyDay.amountOfSoldiers.size}/${amountOfSoldiers}"
 
+            var clicked = false
                 setOnClickListener {
-                    Util.currentDate.postValue(armyDay)
+                    if(!clicked) {
+                        Util.currentDate.postValue(armyDay)
+                        clicked = true
+                    }else{
+                        Util.currentDate.postValue(null)
+                        clicked = false
+                    }
                 }
         }
     }

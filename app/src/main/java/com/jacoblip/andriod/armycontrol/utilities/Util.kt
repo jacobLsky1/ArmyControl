@@ -15,6 +15,7 @@ class Util {
 
         var hasInternet:MutableLiveData<Boolean> = MutableLiveData(true)
 
+        val activityTypes = arrayOf("גיבוש","שטח בנוי","שטח פתוח","קליעה","קרב מגע","חינוך","תעסוקה מבצעית")
 
         val armyJobs = arrayOf("אלפה","חובש","מאג","מטול","מתשאל","נגב","נהג","פקל מפקד","פקל פריצה","צלף","קלע","קשר")
 
@@ -159,7 +160,20 @@ class Util {
             return str
         }
 
-        var soldiersToAdd:MutableList<Soldier> = mutableListOf()
+        fun getDayOfWeek(str:String):String{
+            return when(str){
+                "SUNDAY" ->{"יום ראשון"}
+                "MONDAY" ->{"יום שני"}
+                "TUESDAY" ->{"יום שלישי"}
+                "WEDNESDAY" ->{"יום רביעי"}
+                "THURSDAY" ->{"יום חמישי"}
+                "FRIDAY" ->{"יום שישי"}
+                "SATURDAY" ->{"יום שבת"}
+                else -> ""
+            }
+        }
+
+        var soldiersToAddToActivityLD:MutableLiveData<List<String>> = MutableLiveData(listOf())
         var currentDate:MutableLiveData<ArmyDay> = MutableLiveData()
     }
 

@@ -1,32 +1,36 @@
 package com.jacoblip.andriod.armycontrol.views.adapters
 
-import android.util.Log
+import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.BaseAdapter
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
-import io.realm.internal.Util
-import kotlinx.coroutines.awaitAll
+import com.jacoblip.andriod.armycontrol.databinding.AAddSoldiersForDayBinding.inflate
+import com.jacoblip.andriod.armycontrol.utilities.AddingSoldierHelper
 
-class AddSoldierToDayAdapter (var allSolders:List<Soldier>,var checkEveryOne:Boolean): RecyclerView.Adapter<SoldierItemViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoldierItemViewHolder {
-        when(viewType){
-        }
-        Log.i("Adapter","CreateViewHolder")
-        return SoldierItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.a_item_soldier_for_day, parent, false))
+class AddSoldierToDayAdapter(var context: Context, var allSolders:List<Soldier>, var checkEveryOne:Boolean, var addToActivity:Boolean):BaseAdapter() {
+    private val inflater: LayoutInflater
+            = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+
+    override fun getCount() = allSolders.size
+
+    override fun getItem(p0: Int): Any {
+       return allSolders[p0]
     }
 
-    override fun getItemCount():Int {
-        return allSolders.size
+    override fun getItemId(p0: Int): Long {
+        return p0.toLong()
     }
 
-    override fun onBindViewHolder(holder: SoldierItemViewHolder, position: Int) {
-        val soldier = allSolders[position]
-        holder.itemView.apply {
+    override fun getView(p0: Int, p1: View?, parent: ViewGroup?): View {
+        var soldier = getItem(p0) as Soldier
+        val view = inflater.inflate(R.layout.a_item_soldier_for_day, parent, false)
+        view.apply {
             val nameCB = findViewById<CheckBox>(R.id.nameCheckBox)
             val stationMap = findViewById<TextView>(R.id.stationMapTV)
             val idNumber = findViewById<TextView>(R.id.idNumberTV)
@@ -38,28 +42,15 @@ class AddSoldierToDayAdapter (var allSolders:List<Soldier>,var checkEveryOne:Boo
             pakal.text = soldier.pakal.toString()
 
             nameCB.isChecked = checkEveryOne
-            if(checkEveryOne){
-                com.jacoblip.andriod.armycontrol.utilities.Util.soldiersToAdd.add(soldier)
-            }
-
-            nameCB.setOnCheckedChangeListener { checkBox, isChecked ->
-                if (isChecked) {
-                    com.jacoblip.andriod.armycontrol.utilities.Util.soldiersToAdd.add(soldier)
-                } else {
-                    if (com.jacoblip.andriod.armycontrol.utilities.Util.soldiersToAdd.contains(soldier)
-                    )
-                        com.jacoblip.andriod.armycontrol.utilities.Util.soldiersToAdd.remove(soldier)
+            nameCB.setOnCheckedChangeListener{it,isChecked->
+                if(isChecked){
+                    AddingSoldierHelper.soldiersToAdd.add(soldier)
+                }else{
+                    AddingSoldierHelper.soldiersToAdd.remove(soldier)
                 }
             }
         }
+
+        return view
     }
-
-    override fun getItemViewType(position: Int): Int {
-        when(position){
-
-        }
-        return 0
-    }
-
-
 }
