@@ -9,7 +9,7 @@ class Util {
     companion object{
 
         var inSelectionMode :MutableLiveData<Boolean> = MutableLiveData(false)
-        var addFABY = 0F
+        var addFABY:MutableLiveData<Float> = MutableLiveData(0F)
 
         var userCommandPath:String = ""
 
@@ -20,28 +20,35 @@ class Util {
         val armyJobs = arrayOf("אלפה","חובש","מאג","מטול","מתשאל","נגב","נהג","פקל מפקד","פקל פריצה","צלף","קלע","קשר")
 
 
-        fun getListOfArmyPositions(position: String):List<String>{
-            val topPos = position.split('.')
+        fun getListOfArmyPositions():List<String>{
+            val topPos = userCommandPath.split('.')
             when(topPos.size){
                 1->{
                     return listOf("פיקוד הפלוגה","מפלג","מחלקה 1","מחלקה 2","מחלקה 3","כיתה א מח-1","כיתה ב מח-1","כיתה ג מח-1"
                         ,"כיתה א מח-2","כיתה ב מח-2","כיתה ג מח-2","כיתה א מח-3","כיתה ב מח-3","כיתה ג מח-3")
                 }
                 2->{
-                    return listOf("פיקוד הפלוגה","מפלג","מחלקה 1","מחלקה 2","מחלקה 3","כיתה א מח-1","כיתה ב מח-1","כיתה ג מח-1"
-                        ,"כיתה א מח-2","כיתה ב מח-2","כיתה ג מח-2","כיתה א מח-3","כיתה ב מח-3","כיתה ג מח-3")
+                    if(topPos[1]=="0"){
+                        return listOf("מחלקה 1","כיתה א מח-1","כיתה ב מח-1","כיתה ג מח-1")
+                    }
+                    if(topPos[1]=="1"){
+                        return listOf("מחלקה 2","כיתה א מח-2","כיתה ב מח-2","כיתה ג מח-2")
+                    }
+                    if(topPos[1]=="2"){
+                        return listOf("מחלקה 3","כיתה א מח-3","כיתה ב מח-3","כיתה ג מח-3")
+                    }
+
                 }
                 3->{
-                    return listOf("מפלג","מחלקה 1","מחלקה 2","מחלקה 3","כיתה א מח-1","כיתה ב מח-1","כיתה ג מח-1"
-                        ,"כיתה א מח-2","כיתה ב מח-2","כיתה ג מח-2","כיתה א מח-3","כיתה ב מח-3","כיתה ג מח-3")
+                    return listOf(getPositionByCode(userCommandPath))
                 }
             }
             return emptyList()
         }
 
 
-        fun getListOfCommanderPositions(position: String):List<String>{
-            val topPos = position.split('.')
+        fun getListOfCommanderPositions():List<String>{
+            val topPos = userCommandPath.split('.')
             when(topPos.size){
                 1->{
                     return listOf("מפקד פלוגה","סגן מפקד פלוגה","רספ","מפקד מחלקה 1","מפקד מחלקה 2","מפקד מחלקה 3","סמל מחלקה 1","סמל מחלקה 2","סמל מחלקה 3"
@@ -49,14 +56,18 @@ class Util {
                         ,"מפקד כיתה א מח-3","מפקד כיתה ב מח-3","מפקד כיתה ג מח-3","חייל")
                 }
                 2->{
-                    return listOf("מפקד פלוגה","סגן מפקד פלוגה","רספ","מפקד מחלקה 1","מפקד מחלקה 2","מפקד מחלקה 3","סמל מחלקה 1","סמל מחלקה 2","סמל מחלקה 3"
-                        ,"מפקד כיתה א מח-1","מפקד כיתה ב מח-1","מפקד כיתה ג מח-1","מפקד כיתה א מח-2","מפקד כיתה ב מח-2","מפקד כיתה ג מח-2"
-                        ,"מפקד כיתה א מח-3","מפקד כיתה ב מח-3","מפקד כיתה ג מח-3","חייל")
+                    if(topPos[1]=="0"){
+                        return listOf("מפקד מחלקה 1","סמל מחלקה 1", "מפקד כיתה א מח-1","מפקד כיתה ב מח-1","מפקד כיתה ג מח-1","חייל")
+                    }
+                    if(topPos[1]=="1"){
+                        return listOf("מפקד מחלקה 2","סמל מחלקה 2", "מפקד כיתה א מח-2","מפקד כיתה ב מח-2","מפקד כיתה ג מח-2","חייל")
+                    }
+                    if(topPos[1]=="2"){
+                        return listOf("מפקד מחלקה 3","סמל מחלקה 3", "מפקד כיתה א מח-3","מפקד כיתה ב מח-3","מפקד כיתה ג מח-3","חייל")
+                    }
                 }
                 3->{
-                    return listOf("מפקד מחלקה 1","מפקד מחלקה 2","מפקד מחלקה 3","סמל מחלקה 1","סמל מחלקה 2","סמל מחלקה 3"
-                        ,"מפקד כיתה א מח-1","מפקד כיתה ב מח-1","מפקד כיתה ג מח-1","מפקד כיתה א מח-2","מפקד כיתה ב מח-2","מפקד כיתה ג מח-2"
-                        ,"מפקד כיתה א מח-3","מפקד כיתה ב מח-3","מפקד כיתה ג מח-3","חייל")
+                    return listOf(getArmyJobByCode(userCommandPath),"חייל")
                 }
             }
             return emptyList()

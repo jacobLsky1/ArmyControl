@@ -34,13 +34,10 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
     lateinit var armyJobSpinner: Spinner
     lateinit var positionSpinner: Spinner
     lateinit var isCommanderSwitch: Switch
-    lateinit var editServiceDateButton: Button
     lateinit var hasSoldierArrivedSwitch: Switch
+    lateinit var soldierHasArrivedTV:TextView
     lateinit var whyNotArrivingET:EditText
-    lateinit var activitiesRV:RecyclerView
-    lateinit var serviceDatesRv:RecyclerView
     lateinit var usageTV :TextView
-    lateinit var editActivityFAB:FloatingActionButton
 
     lateinit var checkBox1:CheckBox
     lateinit var checkBox2:CheckBox
@@ -57,8 +54,8 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
 
     lateinit var listOfCheckBoxs:List<CheckBox>
 
-    var listOfDatesOfService :List<Date> = listOf()
-    var listOfSoldierActivities :List<ArmyActivity> = listOf()
+    var listOfDatesOfService :List<Date> = soldier.listOfDatesInService
+    var listOfSoldierActivities :List<ArmyActivity> = soldier.Activates
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -76,21 +73,26 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
 
         isCommander.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             if (it){
-                val jobAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_dropdown_item,Util.getListOfCommanderPositions(soldier.positionMap))
-                val posAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_dropdown_item,Util.getListOfArmyPositions(soldier.positionMap))
+                val jobList = Util.getListOfCommanderPositions()
+                val posList = Util.getListOfArmyPositions()
+                val jobAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_dropdown_item,jobList)
+                val posAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_dropdown_item,posList)
                 armyJobSpinner.adapter  =jobAdapter
                 positionSpinner.adapter = posAdapter
+                armyJobSpinner.setSelection(jobList.indexOf(Util.getArmyJobByCode(soldier.armyJobMap)))
+                positionSpinner.setSelection(posList.indexOf(Util.getPositionByCode(soldier.positionMap)))
             }else{
-                val jobAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_dropdown_item, arrayOf("חייל"))
-                val posAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_dropdown_item,Util.getListOfArmyPositions(soldier.positionMap))
+                val jobList = arrayOf("חייל")
+                val posList = Util.getListOfArmyPositions()
+                val jobAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_dropdown_item, jobList)
+                val posAdapter = ArrayAdapter<String>(requireContext(),android.R.layout.simple_spinner_dropdown_item,posList)
                 armyJobSpinner.adapter  =jobAdapter
                 positionSpinner.adapter = posAdapter
+                positionSpinner.setSelection(posList.indexOf(Util.getPositionByCode(soldier.positionMap)))
+
             }
         })
 
-        editActivityFAB.setOnClickListener {
-
-        }
     }
 
     private fun connectViews(view: View){
@@ -105,13 +107,10 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
             armyJobSpinner = findViewById(R.id.editSoldierSpinnerJob)
             positionSpinner = findViewById(R.id.editSoldierSpinner2)
             isCommanderSwitch = findViewById(R.id.SoldierIsCommanderSwitch)
-            editServiceDateButton = findViewById(R.id.editSoldierEditServiceDates)
             hasSoldierArrivedSwitch = findViewById(R.id.hasArrivedSwitch)
+            soldierHasArrivedTV = findViewById(R.id.soldierHasArrivedTV)
             whyNotArrivingET = findViewById(R.id.editTextWhyNotArriving)
-            activitiesRV = findViewById(R.id.editSoldierCompletedActivities_RV)
-            serviceDatesRv = findViewById(R.id.datesOfServiceRV)
             usageTV= findViewById(R.id.soldierUsageTV)
-            editActivityFAB = findViewById(R.id.editSoldierAddActivityFAB)
             checkBox1 = findViewById(R.id.checkBox1)
             checkBox2 = findViewById(R.id.checkBox2)
             checkBox3 = findViewById(R.id.checkBox3)
@@ -141,14 +140,25 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         whyNotArrivingET.setText(soldier.whyNotArriving)
         usageTV.text = "תפקידים:${soldier.pakal}"
         isCommanderSwitch.isChecked = soldier.isCommander
+        whyNotArrivingET.setText(soldier.whyNotArriving, TextView.BufferType.EDITABLE);
+        hasSoldierArrivedSwitch.isChecked = soldier.hasArrived
+        soldierHasArrivedTV.text = if(hasSoldierArrivedSwitch.isChecked)"כן" else "לא"
+        hasSoldierArrivedSwitch.setOnCheckedChangeListener{ b,isChecked->
+            if(isChecked){
+                soldierHasArrivedTV.text = "כן"
+            }else{
+                soldierHasArrivedTV.text = "לא"
+            }
+        }
+
 
         setUpCheckBoxs()
 
 
     }
 
-    fun setUpCheckBoxs(){
-        var armyUsages = Util.armyJobs
+    private fun setUpCheckBoxs(){
+        val armyUsages = Util.armyJobs
         for(i in listOfCheckBoxs.indices){
             listOfCheckBoxs[i].text = armyUsages[i]
 
@@ -161,7 +171,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         }
     }
 
-    fun updateUsages(usage:String,add:Boolean){
+    private fun updateUsages(usage:String,add:Boolean){
         if(add){
             listOfUsages.add(usage)
         }else{
@@ -170,13 +180,13 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         editUsageTV(listOfUsages.toList())
     }
 
-    fun editUsageTV(usages:List<String>){
+    private fun editUsageTV(usages:List<String>){
         usageTV.text = "תפקידים:${usages}"
     }
 
-    fun setClickEvents(){
+   private fun setClickEvents(){
         saveChangesButton.setOnClickListener {
-            var isValid = checkIfValid()
+            val isValid = checkIfValid()
             if (isValid) {
                 val newSoldier = makeNewSoldier()
                 soldiersViewModel.saveSoldier(newSoldier,oldSoldier)
@@ -189,18 +199,9 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
 
         isCommanderSwitch.setOnCheckedChangeListener{_,isChecked -> isCommander.postValue(isChecked) }
 
-        editServiceDateButton.setOnClickListener {
-
-        }
-        editActivityFAB.setOnClickListener {
-
-        }
-        editActivityFAB.setOnClickListener {
-
-        }
     }
 
-    fun checkIfValid():Boolean{
+    private fun checkIfValid():Boolean{
         if(soldierIdNumberET.text.isEmpty()){
             soldierIdNumberET.error = "שדה חובה"
             return false
@@ -216,21 +217,21 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         return true
     }
 
-    fun makeNewSoldier():Soldier {
-        var name = soldierNameET.text.toString()
-        var idNum = soldierIdNumberET.text.toString()
-        var phone = soldierPhoneNumberET.text.toString()
+   private fun makeNewSoldier():Soldier {
+        val name = soldierNameET.text.toString()
+        val idNum = soldierIdNumberET.text.toString()
+        val phone = soldierPhoneNumberET.text.toString()
         var job = soldierJobET.text.toString()
-        var age = soldierAgeET.text.toString()
-        var medData = soldierMedData.text.toString()
-        var isCommander = isCommanderSwitch.isChecked
-        var jobMap = armyJobSpinner.selectedItem.toString()
-        var posMap = positionSpinner.selectedItem.toString()
-        var armyJob = Util.getArmyJobPosition(jobMap)
-        var soldierPosition = Util.getSoldierArmyPosition(posMap)
-        var hasArrived = hasSoldierArrivedSwitch.isChecked
-        var whyNotArv = whyNotArrivingET.text.toString()
-        var isLieutenant = if (isCommander) {
+        val age = soldierAgeET.text.toString()
+        val medData = soldierMedData.text.toString()
+        val isCommander = isCommanderSwitch.isChecked
+        val jobMap = armyJobSpinner.selectedItem.toString()
+        val posMap = positionSpinner.selectedItem.toString()
+        val armyJob = Util.getArmyJobPosition(jobMap)
+        val soldierPosition = Util.getSoldierArmyPosition(posMap)
+        val hasArrived = hasSoldierArrivedSwitch.isChecked
+        val whyNotArv = whyNotArrivingET.text.toString()
+        val isLieutenant = if (isCommander) {
             armyJob[0] == '-'
         } else false
 

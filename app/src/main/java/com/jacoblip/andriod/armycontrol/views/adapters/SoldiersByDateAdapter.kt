@@ -8,9 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
+import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
 
-class SoldiersByDateAdapter(var armyDays:List<ArmyDay>,var amountOfSoldiers:Int):RecyclerView.Adapter<ArmyDateBySoldiersItemViewHolder>() {
+class SoldiersByDateAdapter(var armyDays:List<ArmyDay>,var mySoldiers:List<Soldier>):RecyclerView.Adapter<ArmyDateBySoldiersItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArmyDateBySoldiersItemViewHolder {
         when(viewType){
         }
@@ -23,12 +24,21 @@ class SoldiersByDateAdapter(var armyDays:List<ArmyDay>,var amountOfSoldiers:Int)
     override fun onBindViewHolder(holder: ArmyDateBySoldiersItemViewHolder, position: Int) {
         val armyDay = armyDays[position]
         holder.itemView.apply {
+            var x = 0
+            for(i in mySoldiers.indices){
+                val soldier = mySoldiers[i]
+                for(j in armyDay.amountOfSoldiers.indices){
+                    val soldierInDay = armyDay.amountOfSoldiers[j]
+                    if(soldierInDay.idNumber==soldier.idNumber)
+                        x++
+                }
+            }
             this.setBackgroundColor(resources.getColor(R.color.darkGray))
             var dateTV = findViewById<TextView>(R.id.armyDayDateTV)
             var amountOfSoldiersTV = findViewById<TextView>(R.id.amountOfSoldiersPerDayTV)
 
             dateTV.text = armyDay.date
-            amountOfSoldiersTV.text = "${armyDay.amountOfSoldiers.size}/${amountOfSoldiers}"
+            amountOfSoldiersTV.text = "${x}/${mySoldiers.size}"
 
             var clicked = false
                 setOnClickListener {

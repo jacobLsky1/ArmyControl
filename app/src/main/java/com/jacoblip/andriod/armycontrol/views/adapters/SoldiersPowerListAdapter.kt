@@ -26,7 +26,7 @@ class SoldiersPowerListAdapter(var soldiers: List<Soldier>, var callbacks: MainS
             var usageTV = findViewById<TextView>(R.id.phoneNumberTV)
 
             nameTV.text = soldier.name
-            idNumberTV.text = soldier.idNumber
+            idNumberTV.text = "עיסוק אזרחי : ${soldier.civilianJob}"
             usageTV.text = soldier.pakal.toString()
 
             setOnClickListener {

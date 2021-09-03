@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
+import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.ActivitiesViewModel
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
@@ -119,13 +120,29 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
         soldierActivityRV.layoutManager = LinearLayoutManager(requireContext())
         datesOfServiceRV.layoutManager =  LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
         var soldierActivities = soldiersViewModel.getSoldierActivities(soldier,activitiesViewModel.listOfArmyDays.value!!)
-
-        soldierActivityRV.adapter = SoldierActivitiesAdapter(soldierActivities)
+        var allActivities = getAllActivities()
+        soldierActivityRV.adapter = SoldierActivitiesAdapter(soldierActivities,allActivities)
         val dates = getSoldierDatesOfService()
         datesOfServiceRV.adapter = DateOfServiceAdapter(dates)
         (datesOfServiceRV.adapter as DateOfServiceAdapter).notifyDataSetChanged()
 
 
+    }
+
+    private fun getAllActivities():List<ArmyActivity>{
+        val list:MutableList<ArmyActivity> = mutableListOf()
+        var armyDays = activitiesViewModel.listOfArmyDays.value!!
+        if(armyDays== null)
+            armyDays = listOf()
+
+        for(i in armyDays.indices){
+            var day = armyDays[i]
+            for(j in day!!.activities.indices){
+                list.add(day!!.activities[j])
+            }
+        }
+
+        return list
     }
 
     fun getSoldierDatesOfService():List<String>{

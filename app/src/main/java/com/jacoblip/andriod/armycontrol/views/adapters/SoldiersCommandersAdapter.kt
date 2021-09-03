@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
+import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
 
 class SoldiersCommandersAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks, var soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV?):RecyclerView.Adapter<SoldierItemViewHolder>() {
@@ -26,8 +27,8 @@ class SoldiersCommandersAdapter(var soldiers: List<Soldier>, var callbacks: Main
             var usageTV = findViewById<TextView>(R.id.phoneNumberTV)
 
             nameTV.text = soldier.name
-            idNumberTV.text = soldier.idNumber
-            usageTV.text = soldier.phoneNumber
+            idNumberTV.text = Util.getPositionByCode(soldier.positionMap)
+            usageTV.text = Util.getArmyJobByCode(soldier.armyJobMap)
             setOnClickListener {
                 callbacks.onSoldierSelectedSelected(soldier, callbacks, soldierSelectedCallbacks)
             }

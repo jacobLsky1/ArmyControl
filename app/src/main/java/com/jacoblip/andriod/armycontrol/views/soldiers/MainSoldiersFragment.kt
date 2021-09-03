@@ -112,7 +112,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
 
             soildersByDateRV.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
             // TODO: 7/5/2021 get soldiers from view model
-            soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers.size)
+            soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers)
 
             allSoldiersButton.setOnClickListener { buttonCallbacks!!.onButtonSelectedSelected(
                 1,
@@ -138,7 +138,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
 
     }
 
-    fun setSearchView(){
+    private fun setSearchView(){
         var listOfNames:MutableList<String> = mutableListOf()
         var soldierHashMap:HashMap<String, Soldier> = hashMapOf()
         for (soldier in listOfAllSoldiers){
@@ -189,14 +189,14 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
 
     }
 
-    fun updateUI(){
-        soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers.size)
+    private fun updateUI(){
+        soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers)
         groupNameTV.text = group?.groupName
-        allSoldiersButton.text = "0/${group?.amountOfSoldiers}"
+        allSoldiersButton.text = "${soldiersViewModel.amountOfSoldiersPresent}/${group?.amountOfSoldiers}"
         setSearchView()
     }
 
-    fun setUpObservers(){
+    private fun setUpObservers(){
 
         soldiersViewModel.userGroup.observe(viewLifecycleOwner, Observer { it ->
             if (it != null) {

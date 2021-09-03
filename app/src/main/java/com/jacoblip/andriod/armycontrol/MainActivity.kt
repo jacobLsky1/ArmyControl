@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -21,9 +23,8 @@ import com.jacoblip.andriod.armycontrol.views.soldiers.*
 
 class MainActivity : AppCompatActivity()
         , MainSoldiersFragment.ButtonCallbacks, MainSoldiersFragment.SoldierCallbacks,
-        MainFragment.AddSoldierCallBacks, MainSoldiersFragment.SoldierSelectedFromRV,
-        SoldierFragment.EditSoldierCallbacks,MainActivitiesFragment.OnActivityPressedCallBacks,
-        MainFragment.AddActivityCallBacks{
+         MainSoldiersFragment.SoldierSelectedFromRV, SoldierFragment.EditSoldierCallbacks,
+        MainActivitiesFragment.OnActivityPressedCallBacks, MainFragment.AddActivityCallBacks{
 
 
     lateinit var soldiersViewModel:SoldiersViewModel
@@ -117,14 +118,6 @@ class MainActivity : AppCompatActivity()
             .commit()
     }
 
-    override fun addSoldier() {
-        fragment = AddSoldierFragment.newInstance(commandPath)
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.main_fragment_container, fragment)
-                .addToBackStack(null)
-                .commit()
-    }
 
     override fun onSoldierSelectedFromRV(soldier: Soldier,addSoldier:Boolean) {
             if (addSoldier) {
@@ -152,13 +145,40 @@ class MainActivity : AppCompatActivity()
 
             if(fragment is RVSoldiersFragment) {
                 fragment.onBackPressed()
+                super.onBackPressed()
+                return
             }
 
         }else{
             if(fragment is SoldierFragment){
                 fragment.onBackPressed()
+                super.onBackPressed()
+                return
             }
-            super.onBackPressed()
+            if(supportFragmentManager.backStackEntryCount==0) {
+                val inflater = layoutInflater
+                val dialogView = inflater.inflate(R.layout.a_alert_for_deleting_activitys, null)
+                var textTV = dialogView.findViewById(R.id.alertTextTV) as TextView
+                val yesButton = dialogView.findViewById(R.id.yesButton) as Button
+                val noButton = dialogView.findViewById(R.id.noButton) as Button
+                textTV.text = "האם תרצה מהאפליקציה?"
+
+                val alertDialog = AlertDialog.Builder(this@MainActivity)
+                alertDialog.setView(dialogView).setCancelable(false)
+
+                val dialog = alertDialog.create()
+                dialog.show()
+
+                noButton.setOnClickListener {
+                    dialog.dismiss()
+                }
+                yesButton.setOnClickListener {
+                    dialog.dismiss()
+                    this.finish()
+                }
+            }else {
+                super.onBackPressed()
+            }
         }
     }
 

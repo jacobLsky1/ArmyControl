@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center">
 
     <ImageView
         android:id="@+id/imageView3"
@@ -20,8 +20,8 @@
         android:id="@+id/textInputLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3">
 
@@ -29,10 +29,10 @@
             android:id="@+id/addSoldierName"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:layout_marginStart="0dp"
             android:layout_marginTop="0dp"
             android:hint="שם החייל"
+            android:inputType="text"
             android:textSize="24sp"></com.google.android.material.textfield.TextInputEditText>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -40,8 +40,8 @@
         android:id="@+id/textInputLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
@@ -49,9 +49,9 @@
             android:id="@+id/addSoldierIdNumber"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:layout_marginTop="0dp"
             android:hint="מספר אישי"
+            android:inputType="text"
             android:textSize="24sp"></com.google.android.material.textfield.TextInputEditText>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -59,8 +59,8 @@
         android:id="@+id/textInputLayout3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
 
@@ -68,9 +68,9 @@
             android:id="@+id/addSoldierPhone"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:layout_marginTop="0dp"
             android:hint="טלפון"
+            android:inputType="text"
             android:textSize="24sp"></com.google.android.material.textfield.TextInputEditText>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -78,8 +78,8 @@
         android:id="@+id/textInputLayout4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
 
@@ -87,9 +87,9 @@
             android:id="@+id/addSoldierCivilianJob"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:layout_marginTop="0dp"
             android:hint="עבודה אזרחית"
+            android:inputType="text"
             android:textSize="24sp"></com.google.android.material.textfield.TextInputEditText>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -97,51 +97,65 @@
         android:id="@+id/SoldierIsCommanderSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
         android:text="תפקיד בפלוגה"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/spinnerArmyJob"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
 
     <TextView
         android:id="@+id/editTextArmyJobAndPosition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
         android:text="מיקום בפלוגה"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/spinnerPosition"
         app:layout_constraintTop_toBottomOf="@+id/SoldierIsCommanderSwitch" />
 
     <Spinner
         android:id="@+id/spinnerArmyJob"
         android:layout_width="200dp"
         android:layout_height="0dp"
+        android:layout_marginEnd="24dp"
         app:layout_constraintBottom_toBottomOf="@+id/SoldierIsCommanderSwitch"
-        app:layout_constraintEnd_toEndOf="@+id/spinnerPosition"
-        app:layout_constraintStart_toStartOf="@+id/spinnerPosition"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/SoldierIsCommanderSwitch" />
 
     <Spinner
         android:id="@+id/spinnerPosition"
         android:layout_width="200dp"
         android:layout_height="0dp"
-        android:layout_marginStart="30dp"
+        android:layout_marginEnd="24dp"
         app:layout_constraintBottom_toBottomOf="@+id/editTextArmyJobAndPosition"
-        app:layout_constraintStart_toEndOf="@+id/editTextArmyJobAndPosition"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/editTextArmyJobAndPosition" />
 
     <Button
         android:id="@+id/addSoldierButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
         android:text="הוסף"
+        app:layout_constraintEnd_toStartOf="@+id/addSoldierCancelButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextArmyJobAndPosition" />
+
+    <Button
+        android:id="@+id/addSoldierCancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="11dp"
+        android:text="ביטול"
+        app:layout_constraintBottom_toBottomOf="@+id/addSoldierButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/addSoldierButton"
+        app:layout_constraintTop_toTopOf="@+id/addSoldierButton" />
 
     <ProgressBar
         android:id="@+id/addSoldierProgressBar"

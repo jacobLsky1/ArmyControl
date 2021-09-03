@@ -111,7 +111,7 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
             if (it != null) {
                 allArmyDaysRV.adapter = SoldiersByDateAdapter(
                     it as List<ArmyDay>,
-                    soldiersViewModel.listOfAllSoldiers!!.size
+                    soldiersViewModel.listOfPersonalSoldiers.value!!
                 )
                 allArmyDays = it
             }
@@ -122,11 +122,11 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
                 selectedDateTV.text =
                     "${Util.getDayOfWeek(localDate.dayOfWeek.toString())} - ${it.date}"
                 allArmyDaysRV.scrollToPosition(allArmyDays!!.indexOf(it))
-                allActivitiesRV.adapter = ArmyActivityAdapter(it.activities, activityCallbacks!!)
+                allActivitiesRV.adapter = ArmyActivityAdapter(it.activities,soldiersViewModel.listOfPersonalSoldiers.value!!, activityCallbacks!!)
                 (allActivitiesRV.adapter as ArmyActivityAdapter).notifyDataSetChanged()
             } else {
                 selectedDateTV.text = "בחר/הוסף יום שירות"
-                allActivitiesRV.adapter = ArmyActivityAdapter(listOf(), null)
+                allActivitiesRV.adapter = ArmyActivityAdapter(listOf(), listOf(),null)
                 (allActivitiesRV.adapter as ArmyActivityAdapter).notifyDataSetChanged()
             }
 
@@ -138,7 +138,7 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        allActivitiesRV.adapter = ArmyActivityAdapter(listOf(), null)
+        allActivitiesRV.adapter = ArmyActivityAdapter(listOf(), listOf(), null)
         (allActivitiesRV.adapter as ArmyActivityAdapter).notifyDataSetChanged()
 
         addArmyDayButton.setOnClickListener {

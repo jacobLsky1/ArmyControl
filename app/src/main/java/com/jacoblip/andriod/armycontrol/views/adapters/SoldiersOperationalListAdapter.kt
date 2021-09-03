@@ -1,6 +1,7 @@
 package com.jacoblip.andriod.armycontrol.views.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
+import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
+import org.w3c.dom.Text
 
 class SoldiersOperationalListAdapter(var soldiers:List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks, var callBacks2: MainSoldiersFragment.SoldierSelectedFromRV?,var passedActivities:List<ArmyActivity>):RecyclerView.Adapter<SoldierItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoldierItemViewHolder {
@@ -31,24 +34,32 @@ class SoldiersOperationalListAdapter(var soldiers:List<Soldier>, var callbacks: 
         }
         var per = amountOfActivitiesCompleted - amoutOfActivitiesSoldierCompleted
         var degree = 0
-        if(per>2){
+        if(per>1){
             degree = 1
         }
-        if(per>4){
+        if(per>3){
             degree = 2
         }
-        if(per>6){
+        if(per>5){
             degree = 3
         }
         holder.itemView.apply {
 
             var nameTV = findViewById<TextView>(R.id.soldierNameTV)
             var idNumberTV = findViewById<TextView>(R.id.IdNumberTV)
-            var usageTV = findViewById<TextView>(R.id.phoneNumberTV)
+            var phoneTV = findViewById<TextView>(R.id.phoneNumberTV)
+            var activitiesTV = findViewById<TextView>(R.id.amountOfActivitiesPassedTV)
 
             nameTV.text = soldier.name
             idNumberTV.text = soldier.idNumber
-            usageTV.text = soldier.phoneNumber
+            phoneTV.text = Util.getPositionByCode(soldier.positionMap)
+            activitiesTV.visibility = View.VISIBLE
+            activitiesTV.text = " פעילויות שהושלמו -${amoutOfActivitiesSoldierCompleted}/${amountOfActivitiesCompleted}"
+
+            nameTV.setTextColor(resources.getColor(R.color.black))
+            idNumberTV.setTextColor(resources.getColor(R.color.black))
+            phoneTV.setTextColor(resources.getColor(R.color.black))
+            activitiesTV.setTextColor(resources.getColor(R.color.black))
 
             var soldierContainer:ConstraintLayout = findViewById(R.id.soldierContainer)
             when(degree){

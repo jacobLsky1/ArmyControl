@@ -56,9 +56,9 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
     lateinit var activityCompletedTV:TextView
     var armyDay: ArmyDay? = null
 
-    var dateOfActivity:String = ""
-    var activityStartTime:String = ""
-    var activityEndTime:String = ""
+    var dateOfActivity:String = armyActivity?.date ?: ""
+    var activityStartTime:String = armyActivity?.startTime ?: ""
+    var activityEndTime:String = armyActivity?.endTime ?: ""
 
 
     override fun onDetach() {
@@ -100,6 +100,9 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
             activityCompletedSwitch = findViewById(R.id.activityCompletedSwitch)
             activityCompletedTV = findViewById(R.id.activityCompletedTV)
 
+            if(Util.userCommandPath.length!=1){
+                addSoldiersButton.isEnabled = false
+            }
 
             participantsRV.layoutManager = StaggeredGridLayoutManager(
                 3,

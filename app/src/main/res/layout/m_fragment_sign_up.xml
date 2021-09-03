@@ -35,6 +35,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/userEmailLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -54,6 +55,7 @@
 
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/userEmailPasswordLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:passwordToggleEnabled="true">
@@ -116,16 +118,15 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
+        android:layout_marginTop="170dp"
         android:text="ברוך הבא לפיקוד ושליטה"
         android:textColor="@color/white"
         android:textSize="30sp"
         android:textStyle="bold|italic"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.819" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/progressBar"

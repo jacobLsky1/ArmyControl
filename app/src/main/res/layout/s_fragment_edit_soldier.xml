@@ -17,7 +17,7 @@
             android:id="@+id/imageView3"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -28,7 +28,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
             android:hint="שם ושם משפחה"
             android:textSize="12dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +37,6 @@
             android:id="@+id/editTextSoldierIdNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginEnd="20dp"
             android:hint="מספר אישי"
             android:textSize="12dp"
@@ -120,11 +118,9 @@
             android:id="@+id/hasArrivedSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="33dp"
+            android:layout_marginStart="10dp"
             android:text="החייל הגיע?"
             app:layout_constraintBottom_toBottomOf="@+id/editTextWhyNotArriving"
-            app:layout_constraintEnd_toStartOf="@+id/editTextWhyNotArriving"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/editTextWhyNotArriving" />
 
@@ -132,11 +128,11 @@
             android:id="@+id/textView12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="24dp"
             android:text="סיבה לאי הגעה:"
             app:layout_constraintEnd_toEndOf="@+id/editTextWhyNotArriving"
             app:layout_constraintStart_toStartOf="@+id/editTextWhyNotArriving"
-            app:layout_constraintTop_toBottomOf="@+id/datesOfServiceRV" />
+            app:layout_constraintTop_toBottomOf="@+id/checkBox10" />
 
         <EditText
             android:id="@+id/editTextWhyNotArriving"
@@ -148,30 +144,7 @@
             android:hint="אין סיבה"
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/hasArrivedSwitch"
             app:layout_constraintTop_toBottomOf="@+id/textView12" />
-
-        <TextView
-            android:id="@+id/textView15"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="פעילויות שבוצעו:"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.442"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextWhyNotArriving" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/editSoldierCompletedActivities_RV"
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView15" />
 
         <Button
             android:id="@+id/saveChangesButton"
@@ -182,17 +155,6 @@
             android:text="שמור שינויים"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/editSoldierAddActivityFAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:clickable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/editSoldierCompletedActivities_RV"
-            app:srcCompat="@drawable/ic_edit_24" />
 
         <Spinner
             android:id="@+id/editSoldierSpinnerJob"
@@ -211,17 +173,6 @@
             app:layout_constraintEnd_toEndOf="@+id/editSoldierSpinnerJob"
             app:layout_constraintTop_toTopOf="@+id/editTextArmyJobAndPosition2" />
 
-        <Button
-            android:id="@+id/editSoldierEditServiceDates"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="עדכן ימי שירות"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.49"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/checkBox11" />
-
         <CheckBox
             android:id="@+id/checkBox2"
             android:layout_width="wrap_content"
@@ -233,16 +184,6 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/checkBox1"
             app:layout_constraintTop_toBottomOf="@+id/soldierUsageTV" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/datesOfServiceRV"
-            android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editSoldierEditServiceDates" />
 
         <TextView
             android:id="@+id/soldierUsageTV"
@@ -376,6 +317,16 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/checkBox11"
             app:layout_constraintTop_toTopOf="@+id/checkBox11" />
+
+        <TextView
+            android:id="@+id/soldierHasArrivedTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            app:layout_constraintBottom_toBottomOf="@+id/hasArrivedSwitch"
+            app:layout_constraintEnd_toStartOf="@+id/editTextWhyNotArriving"
+            app:layout_constraintStart_toEndOf="@+id/hasArrivedSwitch"
+            app:layout_constraintTop_toTopOf="@+id/hasArrivedSwitch" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

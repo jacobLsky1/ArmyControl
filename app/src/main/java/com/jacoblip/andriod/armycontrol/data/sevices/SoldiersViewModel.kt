@@ -29,6 +29,8 @@ import java.util.*
 
      var listOfAllSoldiers :List<Soldier?>? = listOf()
 
+     var amountOfSoldiersPresent = 0
+
     private var _listOfPersonalSoldiers = MutableLiveData<List<Soldier>>()
     var listOfPersonalSoldiers:LiveData<List<Soldier>> = _listOfPersonalSoldiers
 
@@ -68,6 +70,7 @@ import java.util.*
      fun setSoldier(soldier: Soldier) = _nowSoldier.postValue(soldier)
 
      fun updateLists(){
+         amountOfSoldiersPresent = 0
          var allSoldiers = listOfAllSoldiers
          allSoldiers?.sortedBy {
              it?.positionMap
@@ -80,12 +83,18 @@ import java.util.*
                  var commanderLastIndex = position.lastIndex
                  when(position.size){
                      1->{
-                         if(soldierPosition.size>=position.size)
+                         if(soldierPosition.size>=position.size) {
                              listOfSoldiersForGroup.add(soldier)
+                             if(soldier.hasArrived)
+                                 amountOfSoldiersPresent++
+                         }
                      }
                     else->{
-                         if(soldierPosition.size>=position.size&& position[commanderLastIndex]==soldierPosition[commanderLastIndex])
+                         if(soldierPosition.size>=position.size&& position[commanderLastIndex]==soldierPosition[commanderLastIndex]) {
                              listOfSoldiersForGroup.add(soldier)
+                             if(soldier.hasArrived)
+                                 amountOfSoldiersPresent++
+                         }
                      }
 
                  }

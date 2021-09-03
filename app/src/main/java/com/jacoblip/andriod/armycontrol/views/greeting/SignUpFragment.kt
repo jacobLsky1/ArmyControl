@@ -16,6 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -28,6 +29,8 @@ import com.jacoblip.andriod.armycontrol.utilities.ArmyData
 @RequiresApi(Build.VERSION_CODES.O)
 class SignUpFragment(context: Context,var preferences: SharedPreferences,val firstLogIn:Boolean):Fragment() {
 
+    lateinit var userEmailLayout: TextInputLayout
+    lateinit var userEmailPasswordLayout: TextInputLayout
     lateinit var userEmail: TextInputEditText
     lateinit var userEmailPassword: TextInputEditText
     lateinit var userIDnumber: TextInputEditText
@@ -55,11 +58,12 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
             userIDnumber = findViewById(R.id.userIDnumber)
             userPassword = findViewById(R.id.userPassword)
             progressBar = findViewById(R.id.progressBar)
+            userEmailLayout = findViewById(R.id.userEmailLayout)
+            userEmailPasswordLayout = findViewById(R.id.userEmailPasswordLayout)
 
             if(!firstLogIn){
-                // FIXME: 8/29/2021 make the eye disappear
-                userEmail.visibility = View.GONE
-                userEmailPassword.visibility = View.GONE
+                userEmailLayout.visibility = View.GONE
+                userEmailPasswordLayout.visibility = View.GONE
             }
 
             firebaseAuth = FirebaseAuth.getInstance()
@@ -175,7 +179,7 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
                     preferences.edit().putString("ArmyControlVerified", "verified").apply()
                     Log.i("Firebase", firebaseAuth.currentUser.uid)
                     val userID = firebaseAuth.currentUser.uid
-                    initData()
+                    //initData()
                     starArmyActivity(commandPath)
 
                 } else {
