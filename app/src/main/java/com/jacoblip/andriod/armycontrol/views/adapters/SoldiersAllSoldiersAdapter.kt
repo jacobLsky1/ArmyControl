@@ -1,5 +1,7 @@
 package com.jacoblip.andriod.armycontrol.views.adapters
 
+import android.graphics.Color
+import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,12 +30,25 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
         holder.itemView.apply {
             var nameTV = findViewById<TextView>(R.id.soldierNameTV)
             var idNumberTV = findViewById<TextView>(R.id.IdNumberTV)
-            var usageTV = findViewById<TextView>(R.id.phoneNumberTV)
+            var phoneTV = findViewById<TextView>(R.id.phoneNumberTV)
             var checkedImageView = findViewById<ImageView>(R.id.checkedImageView)
+            var isHereTV = findViewById<TextView>(R.id.amountOfActivitiesPassedTV)
 
             nameTV.text = soldier.name
             idNumberTV.text = soldier.idNumber
-            usageTV.text = soldier.phoneNumber
+            phoneTV.text = soldier.phoneNumber
+            Linkify.addLinks(phoneTV, Linkify.PHONE_NUMBERS);
+            phoneTV.linksClickable = true;
+
+            if(soldier.hasArrived){
+                isHereTV.visibility = View.VISIBLE
+                isHereTV.text = "נוכח"
+                isHereTV.setTextColor(Color.GREEN)
+            }else{
+                isHereTV.visibility = View.VISIBLE
+                isHereTV.text = "לא נוכח"
+                isHereTV.setTextColor(Color.RED)
+            }
 
             if(callbacks!=null&&soldierSelectedCallbacks!=null) {
                 setOnLongClickListener {

@@ -1,11 +1,13 @@
 package com.jacoblip.andriod.armycontrol.views.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
+import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
 
 class SoldiersPowerListAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks, var soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV?):RecyclerView.Adapter<SoldierItemViewHolder>() {
@@ -24,10 +26,13 @@ class SoldiersPowerListAdapter(var soldiers: List<Soldier>, var callbacks: MainS
             var nameTV = findViewById<TextView>(R.id.soldierNameTV)
             var idNumberTV = findViewById<TextView>(R.id.IdNumberTV)
             var usageTV = findViewById<TextView>(R.id.phoneNumberTV)
+            var positionMap = findViewById<TextView>(R.id.amountOfActivitiesPassedTV)
 
             nameTV.text = soldier.name
             idNumberTV.text = "עיסוק אזרחי : ${soldier.civilianJob}"
             usageTV.text = soldier.pakal.toString()
+            positionMap.visibility = View.VISIBLE
+            positionMap.text = Util.getPositionByCode(soldier.positionMap)
 
             setOnClickListener {
                 callbacks.onSoldierSelectedSelected(soldier, callbacks, soldierSelectedCallbacks)

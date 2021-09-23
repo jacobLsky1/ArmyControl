@@ -1,27 +1,31 @@
 package com.jacoblip.andriod.armycontrol.views.soldiers
 
+import android.animation.ObjectAnimator
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.SearchView
-import android.widget.TextView
+import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Group
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.ActivitiesViewModel
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
+import com.jacoblip.andriod.armycontrol.utilities.LinearLayoutHelper
 import com.jacoblip.andriod.armycontrol.views.adapters.SoldiersByDateAdapter
+import com.mikhaellopez.circularprogressbar.CircularProgressBar
 
 
 class MainSoldiersFragment(var commandPath: String):Fragment() {
@@ -31,12 +35,17 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     lateinit var groupNameTV:TextView
     lateinit var searchView:SearchView
     lateinit var searchList:ListView
-    lateinit var commandersButton: TextView
-    lateinit var allSoldiersButton:TextView
-    lateinit var operationalListButton:TextView
-    lateinit var powerListButton:TextView
+    lateinit var commandersButton: Button
+    lateinit var allSoldiersButton:Button
+    lateinit var operationalListButton:Button
+    lateinit var powerListButton:Button
+    lateinit var amountOfSoldiersPresentTV:TextView
+    lateinit var amountOfCommandersTV:TextView
+    lateinit var noArmyDaysYetTV :TextView
+    lateinit var soldiersProgressBar: CircularProgressBar
     lateinit var soldiersViewModel: SoldiersViewModel
     lateinit var activityViewModel:ActivitiesViewModel
+    lateinit var noItemsFoundIV:ImageView
     var group:Group? = null
     var listOfAllSoldiers:List<Soldier> = listOf()
 
@@ -80,6 +89,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -97,7 +107,12 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
             powerListButton = findViewById(R.id.powerListButton)
             operationalListButton =    findViewById(R.id.operationalButton)
             searchView = findViewById(R.id.soldierSearchView)
+            amountOfSoldiersPresentTV = findViewById(R.id.amountOfSoldiersPresent)
+            amountOfCommandersTV = findViewById(R.id.commandersTVSoldiersFragment)
+            noArmyDaysYetTV = findViewById(R.id.noArmyDaysYetTV)
             searchList = findViewById(R.id.activitiesSearchListView)
+            noItemsFoundIV = findViewById(R.id.noItemsFoundImage)
+            soldiersProgressBar = findViewById(R.id.soldiersProgressBar)
             searchView.queryHint = "חפש חייל";
         }
 
@@ -110,8 +125,10 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
         super.onViewCreated(view, savedInstanceState)
         view.apply {
 
-            soildersByDateRV.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
-            // TODO: 7/5/2021 get soldiers from view model
+            soildersByDateRV.layoutManager = LinearLayoutHelper(requireContext())
+            val itemSnapHelper: SnapHelper = LinearSnapHelper()
+            itemSnapHelper.attachToRecyclerView(soildersByDateRV)
+            //soildersByDateRV.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
             soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers)
 
             allSoldiersButton.setOnClickListener { buttonCallbacks!!.onButtonSelectedSelected(
@@ -189,13 +206,24 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun updateUI(){
         soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers)
         groupNameTV.text = group?.groupName
-        allSoldiersButton.text = "${soldiersViewModel.amountOfSoldiersPresent}/${group?.amountOfSoldiers}"
+        val numSoldiers = soldiersViewModel.amountOfSoldiersPresent.toFloat()
+        amountOfSoldiersPresentTV.text = "דו''ח 1:\n ${numSoldiers.toInt()}/${group?.amountOfSoldiers}"
+        amountOfCommandersTV.text = "${soldiersViewModel.listOfUserCommanders.size} מפקדים"
         setSearchView()
+        var amountOfSoldiers = group?.amountOfSoldiers?.toFloat()
+        if(amountOfSoldiers!=null){
+            var num = (numSoldiers/amountOfSoldiers)*100
+            soldiersProgressBar.setProgressWithAnimation(num);
+        }
+
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun setUpObservers(){
 
         soldiersViewModel.userGroup.observe(viewLifecycleOwner, Observer { it ->
@@ -213,8 +241,17 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
 
         activityViewModel.listOfArmyDays.observe(viewLifecycleOwner, Observer {
             if(it!=null){
-                listOfArmyDays = it as List<ArmyDay>
-                updateUI()
+                if(it.isEmpty()){
+                    noArmyDaysYetTV.visibility = View.VISIBLE
+                    noItemsFoundIV.visibility = View.VISIBLE
+                    soildersByDateRV.visibility = View.GONE
+                }else {
+                    noArmyDaysYetTV.visibility = View.GONE
+                    noItemsFoundIV.visibility = View.GONE
+                    soildersByDateRV.visibility = View.VISIBLE
+                    listOfArmyDays = it as List<ArmyDay>
+                    updateUI()
+                }
             }
         })
     }

@@ -5,7 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/background3">
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -36,7 +37,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="40dp"
         android:gravity="center"
-        android:text='פלוגה "ב"'
+        android:text='פלוגה ב'
         android:textColor="#FFFFFF"
         android:textSize="36sp"
         android:textStyle="bold|italic"
@@ -54,7 +55,7 @@
         app:layout_constraintBottom_toTopOf="@+id/addArmyDayButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        app:layout_constraintTop_toBottomOf="@+id/pickedDayActivitiesTV" />
 
     <Button
         android:id="@+id/deleteAllActivitesButton"
@@ -84,15 +85,12 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/allArmyDaysRV"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintTop_toBottomOf="@+id/noArmyDaysImage" />
 
     <Button
         android:id="@+id/addArmyDayButton"
@@ -124,23 +122,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="ימי שירות:"
-        android:textSize="24sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textClock" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/pickedDayActivitiesTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
         android:text="פעילויות:"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/allArmyDaysRV" />
+        app:layout_constraintTop_toBottomOf="@+id/selectedDateTV" />
 
     <TextView
         android:id="@+id/selectedDateTV"
@@ -151,9 +149,31 @@
         android:text="תאריך נבחר"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textView6"
+        app:layout_constraintBottom_toTopOf="@+id/pickedDayActivitiesTV"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/allArmyDaysRV" />
+
+    <TextView
+        android:id="@+id/noDaysYetTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="עדיין לא נוספו ימי שירות..."
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+    <ImageView
+        android:id="@+id/noArmyDaysImage"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/noDaysYetTV"
+        app:srcCompat="@drawable/emptybox" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -36,10 +36,10 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
     lateinit var soldierIsCommander:TextView
     lateinit var soldierPhoneNumber:TextView
     lateinit var soldierCivilianJob:TextView
+    lateinit var isSoldierHereTV:TextView
     lateinit var soldierPosition:TextView
     lateinit var datesOfServiceRV:RecyclerView
     lateinit var soldierIsComingTV: TextView
-    lateinit var soldierIsHereTV:TextView
     lateinit var whySoldierIsNotComingTV:TextView
     lateinit var directSoldiersRV:RecyclerView
     lateinit var soldierActivityRV:RecyclerView
@@ -109,6 +109,8 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
         soldierPhoneNumber.text = soldier.phoneNumber
         soldierCivilianJob.text = soldier.civilianJob
         soldierPosition.text = Util.getPositionByCode(soldier.positionMap)
+        isSoldierHereTV.text = if(soldier.hasArrived) "כן" else "לא"
+        whySoldierIsNotComingTV.text = if(soldier.whyNotArriving!="") soldier.whyNotArriving else "אין סיבה"
 
         editSoldierButton.setOnClickListener {
             editSoldierCallbacks?.onEditSoldierSelected(soldier)
@@ -150,7 +152,7 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
         var listOfDates = mutableListOf<String>()
         if(daysOfService!= null){
             for(day in daysOfService){
-                if(day?.amountOfSoldiers!!.contains(soldier)){
+                if(day?.listOfSoldiers!!.contains(soldier.idNumber)){
                     listOfDates.add(day.date)
                 }
             }
@@ -174,10 +176,10 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
             soldierPosition = findViewById(R.id.editTextArmyJobAndPosition)
             datesOfServiceRV = findViewById(R.id.datesOfService_RV)
             soldierIsComingTV = findViewById(R.id.isArrivingSwitch)
-            soldierIsHereTV = findViewById(R.id.hasArrivedSwitch)
             whySoldierIsNotComingTV  = findViewById(R.id.editTextWhyNotArriving)
             directSoldiersRV = findViewById(R.id.editSoldierDirectSoldiers_RV)
             soldierActivityRV = findViewById(R.id.editSoldierCompletedActivities_RV)
+            isSoldierHereTV = findViewById(R.id.isSoldierHereTV)
 
         }
     }

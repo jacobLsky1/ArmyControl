@@ -54,7 +54,7 @@ class SoldiersOperationalListAdapter(var soldiers:List<Soldier>, var callbacks: 
             idNumberTV.text = soldier.idNumber
             phoneTV.text = Util.getPositionByCode(soldier.positionMap)
             activitiesTV.visibility = View.VISIBLE
-            activitiesTV.text = " פעילויות שהושלמו -${amoutOfActivitiesSoldierCompleted}/${amountOfActivitiesCompleted}"
+            activitiesTV.text = " פעילויות שהושלמו:\n${amoutOfActivitiesSoldierCompleted}/${amountOfActivitiesCompleted}"
 
             nameTV.setTextColor(resources.getColor(R.color.black))
             idNumberTV.setTextColor(resources.getColor(R.color.black))

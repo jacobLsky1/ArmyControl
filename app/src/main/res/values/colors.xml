@@ -11,8 +11,9 @@
     <color name="darkGray">#4d4d4d</color>
     <color name="darkGreen">#556b2f</color>
     <color name="itemGray">#a5a5a5</color>
-    <color name="red">#ff0000</color>
-    <color name="orange">#ffa500</color>
-    <color name="yellow">#ffff00</color>
+    <color name="red">#80ff0000</color>
+    <color name="orange">#80ffa500</color>
+    <color name="yellow">#80ffff00</color>
     <color name="green">#008000</color>
+    <color name="sand">#c2b280</color>
 </resources>

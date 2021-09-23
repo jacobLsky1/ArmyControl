@@ -1,16 +1,25 @@
 package com.jacoblip.andriod.armycontrol
 
+import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.navigation.NavigationView
 import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.*
@@ -26,12 +35,16 @@ class MainActivity : AppCompatActivity()
          MainSoldiersFragment.SoldierSelectedFromRV, SoldierFragment.EditSoldierCallbacks,
         MainActivitiesFragment.OnActivityPressedCallBacks, MainFragment.AddActivityCallBacks{
 
+    lateinit var toggle: ActionBarDrawerToggle
+    lateinit var navView: NavigationView
+    lateinit var drawerLayout: DrawerLayout
 
     lateinit var soldiersViewModel:SoldiersViewModel
     lateinit var activitiesViewModel:ActivitiesViewModel
     lateinit var wifiReceiver:WifiReceiver
     lateinit var fragment: Fragment
     lateinit var removeButton: Button
+    lateinit var preferences : SharedPreferences
     var listOfSoldiersSelected = mutableListOf<Soldier>()
     var commandPath = "1"
 
@@ -39,9 +52,17 @@ class MainActivity : AppCompatActivity()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.m_activity_main)
         removeButton = findViewById(R.id.deleteSoldierButton)
+        navView = findViewById(R.id.navView)
+        drawerLayout = findViewById(R.id.drawerLayout)
+        preferences = getSharedPreferences("armyControl", Context.MODE_PRIVATE)
         var intent = intent
         commandPath = intent.getStringExtra("commandPath").toString()
         Util.userCommandPath = commandPath
+
+        val toolbar: Toolbar = findViewById(R.id.tool_bar)
+        setSupportActionBar(toolbar)
+
+        setUpActionDrawer()
 
         //Realm.init(this)
         //var realmConfiguration = RealmConfiguration.Builder().deleteRealmIfMigrationNeeded().build()
@@ -156,29 +177,33 @@ class MainActivity : AppCompatActivity()
                 return
             }
             if(supportFragmentManager.backStackEntryCount==0) {
-                val inflater = layoutInflater
-                val dialogView = inflater.inflate(R.layout.a_alert_for_deleting_activitys, null)
-                var textTV = dialogView.findViewById(R.id.alertTextTV) as TextView
-                val yesButton = dialogView.findViewById(R.id.yesButton) as Button
-                val noButton = dialogView.findViewById(R.id.noButton) as Button
-                textTV.text = "האם תרצה מהאפליקציה?"
-
-                val alertDialog = AlertDialog.Builder(this@MainActivity)
-                alertDialog.setView(dialogView).setCancelable(false)
-
-                val dialog = alertDialog.create()
-                dialog.show()
-
-                noButton.setOnClickListener {
-                    dialog.dismiss()
-                }
-                yesButton.setOnClickListener {
-                    dialog.dismiss()
-                    this.finish()
-                }
+              exitDialog()
             }else {
                 super.onBackPressed()
             }
+        }
+    }
+
+    private fun exitDialog(){
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.a_alert_for_deleting_activitys, null)
+        var textTV = dialogView.findViewById(R.id.alertTextTV) as TextView
+        val yesButton = dialogView.findViewById(R.id.yesButton) as Button
+        val noButton = dialogView.findViewById(R.id.noButton) as Button
+        textTV.text = "האם תרצה לצאת מהאפליקציה?"
+
+        val alertDialog = AlertDialog.Builder(this@MainActivity)
+        alertDialog.setView(dialogView).setCancelable(false)
+
+        val dialog = alertDialog.create()
+        dialog.show()
+
+        noButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        yesButton.setOnClickListener {
+            dialog.dismiss()
+            this.finish()
         }
     }
 
@@ -193,6 +218,36 @@ class MainActivity : AppCompatActivity()
 
     override fun addActivity() {
         onActivityPressed(null)
+    }
+
+    fun setUpActionDrawer(){
+        toggle = ActionBarDrawerToggle(this,drawerLayout,R.string.open,R.string.close)
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        navView.setNavigationItemSelectedListener {
+                when (it.itemId) {
+                    R.id.switchUserButton -> {
+                        preferences.edit().putString("ArmyControlLoggedIn", "").apply()
+                        val intent = Intent(this, LoginActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                        true
+                    }
+                    R.id.exitAppButton -> {
+                        exitDialog()
+                        true
+                    }
+                    else -> {true}
+                }
+                }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(toggle.onOptionsItemSelected(item))
+            return true
+        return super.onOptionsItemSelected(item)
     }
 
 

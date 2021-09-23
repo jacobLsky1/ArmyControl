@@ -32,7 +32,7 @@ import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.activities.MainActivitiesFragment
 import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
 
-class MainFragment(var commandPath: String):Fragment() {
+class MainFragment(commandPath: String):Fragment() {
 
     lateinit var bottomNavigationView:BottomNavigationView
     lateinit var addFAB:FloatingActionButton
@@ -42,8 +42,6 @@ class MainFragment(var commandPath: String):Fragment() {
     var activiteiesFragment:Fragment = MainActivitiesFragment.newInstance(commandPath)
     var fragmentReady:MutableLiveData<Boolean> = MutableLiveData()
     var fabClicked:Boolean = false
-    var addSoldierY : Float = 0F
-    var addActivityY : Float = 0F
     lateinit var soldiersViewModel:SoldiersViewModel
     lateinit var currentFragment:Fragment
 
@@ -124,7 +122,7 @@ class MainFragment(var commandPath: String):Fragment() {
     fun setUpObservers(){
         fragmentReady.observe(viewLifecycleOwner, Observer {
             if (it) {
-                getYs()
+
             }
         })
     }
@@ -135,21 +133,6 @@ class MainFragment(var commandPath: String):Fragment() {
         fragmentReady.postValue(true)
     }
 
-    fun getYs(){
-        if(Util.addFABY.value==0F) {
-            if (addFAB.y == 0F) {
-                fragmentReady.postValue(true)
-            } else {
-                Util.addFABY.postValue(addFAB.y)
-                addFAB.visibility = View.VISIBLE
-            }
-        }else{
-            addSoldierY = Util.addFABY.value!!
-            addActivityY = Util.addFABY.value!!
-            Log.i("MainFragment", addActivityY.toString())
-            Log.i("MainFragment", addSoldierY.toString())
-        }
-    }
 
     private fun setClickEvents(){
         addFAB.setOnClickListener {

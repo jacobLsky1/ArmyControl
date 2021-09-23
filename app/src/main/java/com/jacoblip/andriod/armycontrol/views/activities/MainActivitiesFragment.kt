@@ -10,10 +10,13 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
 import com.aminography.primecalendar.PrimeCalendar
 import com.aminography.primecalendar.civil.CivilCalendar
 import com.aminography.primedatepicker.picker.PrimeDatePicker
@@ -26,6 +29,7 @@ import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.ActivitiesViewModel
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.utilities.AddingSoldierHelper
+import com.jacoblip.andriod.armycontrol.utilities.LinearLayoutHelper
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.adapters.*
 import java.time.LocalDate
@@ -42,11 +46,14 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
     lateinit var addArmyDayButton: Button
     lateinit var groupNameTV:TextView
     lateinit var selectedDateTV: TextView
+    lateinit var pickedDayActivitiesTV:TextView
     lateinit var timeTV:TextClock
     lateinit var allArmyDaysRV:RecyclerView
     lateinit var allActivitiesRV:RecyclerView
     lateinit var deleteAllActivitiesButton:Button
     lateinit var addActivityFAB: FloatingActionButton
+    lateinit var noDaysYetTV: TextView
+    lateinit var noArmyDayImageIV:ImageView
     var allArmyDays :List<ArmyDay?>? = null
 
 
@@ -94,14 +101,15 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
             selectedDateTV = findViewById(R.id.selectedDateTV)
             allArmyDaysRV = findViewById(R.id.allArmyDaysRV)
             allActivitiesRV = findViewById(R.id.allActivitiesInDayRV)
+            pickedDayActivitiesTV = findViewById(R.id.pickedDayActivitiesTV)
             deleteAllActivitiesButton = findViewById(R.id.deleteAllActivitesButton)
             addActivityFAB = findViewById(R.id.addActivityFAB)
+            noDaysYetTV = findViewById(R.id.noDaysYetTV)
+            noArmyDayImageIV = findViewById(R.id.noArmyDaysImage)
             allActivitiesRV.layoutManager = LinearLayoutManager(requireContext())
-            allArmyDaysRV.layoutManager = LinearLayoutManager(
-                requireContext(),
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
+            allArmyDaysRV.layoutManager = LinearLayoutHelper(requireContext())
+            val itemSnapHelper: SnapHelper = LinearSnapHelper()
+            itemSnapHelper.attachToRecyclerView(allArmyDaysRV)
             searchView.queryHint = "חפש פעילות";
         }
     }
@@ -109,11 +117,31 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
     private fun setUpObservers(){
         activitiesViewModel.listOfArmyDays.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             if (it != null) {
-                allArmyDaysRV.adapter = SoldiersByDateAdapter(
-                    it as List<ArmyDay>,
-                    soldiersViewModel.listOfPersonalSoldiers.value!!
-                )
-                allArmyDays = it
+                if(it.isEmpty()){
+                    noDaysYetTV.visibility = View.VISIBLE
+                    noArmyDayImageIV.visibility = View.VISIBLE
+                    allArmyDaysRV.visibility = View.GONE
+                    selectedDateTV.visibility = View.GONE
+                    pickedDayActivitiesTV.visibility = View.GONE
+                    allActivitiesRV.visibility = View.GONE
+                    addActivityFAB.visibility = View.GONE
+                    deleteAllActivitiesButton.isEnabled = false
+
+                }else {
+                    noDaysYetTV.visibility = View.GONE
+                    noArmyDayImageIV.visibility = View.GONE
+                    allArmyDaysRV.visibility = View.VISIBLE
+                    selectedDateTV.visibility = View.VISIBLE
+                    pickedDayActivitiesTV.visibility = View.VISIBLE
+                    allActivitiesRV.visibility = View.VISIBLE
+                    addActivityFAB.visibility = View.VISIBLE
+                    deleteAllActivitiesButton.isEnabled = true
+                    allArmyDaysRV.adapter = SoldiersByDateAdapter(
+                            it as List<ArmyDay>,
+                            soldiersViewModel.listOfPersonalSoldiers.value!!
+                    )
+                    allArmyDays = it
+                }
             }
         })
         Util.currentDate.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
@@ -121,7 +149,7 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
                 var localDate = LocalDate.parse(it.date)
                 selectedDateTV.text =
                     "${Util.getDayOfWeek(localDate.dayOfWeek.toString())} - ${it.date}"
-                allArmyDaysRV.scrollToPosition(allArmyDays!!.indexOf(it))
+                //allArmyDaysRV.scrollToPosition(allArmyDays!!.indexOf(it))
                 allActivitiesRV.adapter = ArmyActivityAdapter(it.activities,soldiersViewModel.listOfPersonalSoldiers.value!!, activityCallbacks!!)
                 (allActivitiesRV.adapter as ArmyActivityAdapter).notifyDataSetChanged()
             } else {
@@ -314,6 +342,15 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
         val dialog = alertDialog.create()
         dialog.show()
 
+        signNoOneCB.isChecked = true
+        AddingSoldierHelper.soldiersToAdd = mutableListOf()
+        soldiersRV.adapter  = AddSoldierToDayAdapter(
+                requireContext(),
+                allSoldiers as List<Soldier>,
+                false,
+                false
+        )
+
         signAllCB.setOnCheckedChangeListener { checkBox, isChecked ->
             if(isChecked) {
                 signNoOneCB.isChecked = false
@@ -368,10 +405,14 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
 
     }
 
-    fun getArmySoldiersFromAdapter():List<Soldier>{
+    fun getArmySoldiersFromAdapter():List<String>{
         var list = AddingSoldierHelper.soldiersToAdd
+        var listOfIDs = mutableListOf<String>()
+        for(soldier in list){
+            listOfIDs.add(soldier.idNumber)
+        }
         AddingSoldierHelper.soldiersToAdd = mutableListOf()
-        return list
+        return listOfIDs
     }
 
     companion object{

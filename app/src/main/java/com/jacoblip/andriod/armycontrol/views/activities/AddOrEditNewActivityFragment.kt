@@ -188,11 +188,11 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
                 var soldiers =  Util.soldiersToAddToActivityLD.value?: listOf<String>()
                 val newArmyActivity = ArmyActivity(type, name, date, startTime, endTime, location, soldiers, isCompleted)
 
-                var list:MutableList<Soldier> = mutableListOf()
+                var list:MutableList<String> = mutableListOf()
                 val allSoldiers = soldiersViewModel.listOfAllSoldiers
                 for(soldier in allSoldiers!!){
                     if(soldiers.contains(soldier!!.idNumber)){
-                        list.add(soldier)
+                        list.add(soldier!!.idNumber)
                     }
                 }
 
@@ -302,6 +302,16 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
         }
     }
 
+    private fun getSoldiersById(listOfIds:List<String>):List<Soldier>{
+        var soldiers = soldiersViewModel.listOfPersonalSoldiers.value
+        var list = mutableListOf<Soldier>()
+        for (soldier in soldiers!!){
+            if(listOfIds.contains(soldier.idNumber))
+                list.add(soldier)
+        }
+        return list
+    }
+
 
     private fun getSoldiersAttending(){
         var i = 0
@@ -309,7 +319,7 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
         if(armyDay==null){
             allSoldiers = soldiersViewModel.listOfPersonalSoldiers.value?: listOf()
         }else{
-            allSoldiers = armyDay!!.amountOfSoldiers
+            allSoldiers = getSoldiersById(armyDay!!.listOfSoldiers)
         }
         val inflater = layoutInflater
         val dialogView = inflater.inflate(R.layout.a_add_soldiers_for_day, null)
@@ -320,6 +330,15 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
         var signNoOneCB =     dialogView.findViewById(R.id.signNoOneCB) as CheckBox
         val cancelButton = dialogView.findViewById<Button>(R.id.cancelButton)
         dialogDateTV.text = dateTV.text
+
+        signAllCB.isChecked = false
+        AddingSoldierHelper.soldiersToAdd = mutableListOf()
+        soldiersRV.adapter  = AddSoldierToDayAdapter(
+                requireContext(),
+                allSoldiers as List<Soldier>,
+                false,
+                true
+        )
 
 
         val alertDialog = AlertDialog.Builder(requireContext())

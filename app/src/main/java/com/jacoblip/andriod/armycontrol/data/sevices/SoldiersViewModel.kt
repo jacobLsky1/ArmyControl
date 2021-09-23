@@ -69,12 +69,155 @@ import java.util.*
 
      fun setSoldier(soldier: Soldier) = _nowSoldier.postValue(soldier)
 
+     fun sortAllSoldiers(allSoldiers:MutableList<Soldier>):MutableList<Soldier>{
+         var sortedSoldiers = mutableListOf<Soldier>()
+         var headGroup : MutableList<Soldier> = mutableListOf()
+         var subGroup1 : MutableList<Soldier> = mutableListOf()
+         var subsubGroup1a : MutableList<Soldier> = mutableListOf()
+         var subsubGroup1b : MutableList<Soldier> = mutableListOf()
+         var subsubGroup1c : MutableList<Soldier> = mutableListOf()
+         var subGroup2 : MutableList<Soldier> = mutableListOf()
+         var subsubGroup2a : MutableList<Soldier> = mutableListOf()
+         var subsubGroup2b : MutableList<Soldier> = mutableListOf()
+         var subsubGroup2c : MutableList<Soldier> = mutableListOf()
+         var subGroup3 : MutableList<Soldier> = mutableListOf()
+         var subsubGroup3a : MutableList<Soldier> = mutableListOf()
+         var subsubGroup3b : MutableList<Soldier> = mutableListOf()
+         var subsubGroup3c : MutableList<Soldier> = mutableListOf()
+         var backGroup : MutableList<Soldier> = mutableListOf()
+
+
+         for(soldier in allSoldiers){
+             var map = soldier.positionMap.split('.')
+             if(map.size==1){
+                 if(!soldier.isLieutenant)
+                     headGroup.add(0,soldier)
+                 else{
+                     if(headGroup.size==0)
+                         headGroup.add(soldier)
+                     else
+                         headGroup.add(1,soldier)
+                 }
+
+             }
+             if(map.size==2){
+                 var num = map[map.lastIndex].toInt()
+                when(num){
+                    0->{
+                        if(!soldier.isLieutenant)
+                            subGroup1.add(0,soldier)
+                        else{
+                            if(subGroup1.size==0)
+                                subGroup1.add(soldier)
+                            else
+                                subGroup1.add(1,soldier)
+                        }
+                    }
+                    1->{
+                        if(!soldier.isLieutenant)
+                            subGroup2.add(0,soldier)
+                        else{
+                            if(subGroup2.size==0)
+                                subGroup2.add(soldier)
+                            else
+                                subGroup2.add(1,soldier)
+                        }
+                    }
+                    2->{
+                        if(!soldier.isLieutenant)
+                            subGroup3.add(0,soldier)
+                        else{
+                            if(subGroup3.size==0)
+                                subGroup3.add(soldier)
+                            else
+                                subGroup3.add(1,soldier)
+                        }
+                    }
+                    3->{
+                        if(soldier.isCommander){
+                            backGroup.add(0,soldier)
+                        }else backGroup.add(soldier)
+                    }
+                }
+             }
+             if(map.size==3){
+                 var num1 = map[map.lastIndex].toInt()
+                 var num2 = map[map.lastIndex-1].toInt()
+                 if(num1==0&&num2==0){
+                     if(soldier.isCommander){
+                         subsubGroup1a.add(0,soldier)
+                     }
+                     else subsubGroup1a.add(soldier)
+                 }
+                 if(num1==0&&num2==1){
+                     if(soldier.isCommander){
+                         subsubGroup1b.add(0,soldier)
+                     }
+                     else subsubGroup1b.add(soldier)
+                 }
+                 if(num1==0&&num2==2){
+                     if(soldier.isCommander){
+                         subsubGroup1c.add(0,soldier)
+                     }
+                     else subsubGroup1c.add(soldier)
+                 }
+                 if(num1==1&&num2==0){
+                     if(soldier.isCommander){
+                         subsubGroup2a.add(0,soldier)
+                     }
+                     else subsubGroup2a.add(soldier)
+                 }
+                 if(num1==1&&num2==1){
+                     if(soldier.isCommander){
+                         subsubGroup2b.add(0,soldier)
+                     }
+                     else subsubGroup2b.add(soldier)
+                 }
+                 if(num1==1&&num2==2){
+                     if(soldier.isCommander){
+                         subsubGroup2c.add(0,soldier)
+                     }
+                     else subsubGroup2c.add(soldier)
+                 }
+                 if(num1==2&&num2==0){
+                     if(soldier.isCommander){
+                         subsubGroup3a.add(0,soldier)
+                     }
+                     else subsubGroup3a.add(soldier)
+                 }
+                 if(num1==2&&num2==1){
+                     if(soldier.isCommander){
+                         subsubGroup3b.add(0,soldier)
+                     }
+                     else subsubGroup3b.add(soldier)
+                 }
+                 if(num1==2&&num2==2){
+                     if(soldier.isCommander){
+                         subsubGroup3c.add(0,soldier)
+                     }
+                     else subsubGroup3c.add(soldier)
+                 }
+             }
+
+         }
+
+         val allGroups = listOf(headGroup,subGroup1,subsubGroup1a,subsubGroup1b,subsubGroup1c,subGroup2,subsubGroup2a,subsubGroup2b,subsubGroup2c,subGroup3,subsubGroup3a,subsubGroup3b,subsubGroup3c)
+
+         for(group in allGroups){
+             sortedSoldiers.addAll(group)
+         }
+
+         return sortedSoldiers
+     }
+
      fun updateLists(){
          amountOfSoldiersPresent = 0
-         var allSoldiers = listOfAllSoldiers
-         allSoldiers?.sortedBy {
-             it?.positionMap
+         var allSoldiers:MutableList<Soldier> = mutableListOf()
+         if(listOfAllSoldiers!=null){
+             allSoldiers = (listOfAllSoldiers as List<Soldier>).toMutableList()
+             allSoldiers = sortAllSoldiers(allSoldiers)
          }
+
          var position = commandPathToArray(soldierCommandPath)
          var listOfSoldiersForGroup = mutableListOf<Soldier>()
          if (allSoldiers != null) {
@@ -113,6 +256,7 @@ import java.util.*
          }
          listOfUserCommanders = commanders
          listOfSoldiersWithPower = powers
+
      }
 
 

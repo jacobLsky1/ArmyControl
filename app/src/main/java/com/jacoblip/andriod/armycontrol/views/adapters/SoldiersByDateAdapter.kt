@@ -1,63 +1,78 @@
 package com.jacoblip.andriod.armycontrol.views.adapters
 
 import android.graphics.Color
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
+import java.time.LocalDate
 
 class SoldiersByDateAdapter(var armyDays:List<ArmyDay>,var mySoldiers:List<Soldier>):RecyclerView.Adapter<ArmyDateBySoldiersItemViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArmyDateBySoldiersItemViewHolder {
         when(viewType){
+            0->{
+                return ArmyDateBySoldiersItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.blank, parent, false))
+            }
+            1->{
+                return ArmyDateBySoldiersItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.s_item_amount_of_soldiers_by_date, parent, false))
+            }
         }
-        Log.i("Adapter","CreateViewHolder")
         return ArmyDateBySoldiersItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.s_item_amount_of_soldiers_by_date, parent, false))
     }
 
-    override fun getItemCount() = armyDays.size
+    override fun getItemCount() = armyDays.size+2
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ArmyDateBySoldiersItemViewHolder, position: Int) {
-        val armyDay = armyDays[position]
-        holder.itemView.apply {
-            var x = 0
-            for(i in mySoldiers.indices){
-                val soldier = mySoldiers[i]
-                for(j in armyDay.amountOfSoldiers.indices){
-                    val soldierInDay = armyDay.amountOfSoldiers[j]
-                    if(soldierInDay.idNumber==soldier.idNumber)
-                        x++
+        if(position != 0 && position != armyDays.size+1) {
+            val armyDay = armyDays[position - 1]
+            holder.itemView.apply {
+                var x = 0
+                for (i in mySoldiers.indices) {
+                    val soldier = mySoldiers[i]
+                    for (j in armyDay.listOfSoldiers.indices) {
+                        val soldierInDay = armyDay.listOfSoldiers[j]
+                        if (soldierInDay == soldier.idNumber)
+                            x++
+                    }
                 }
-            }
-            this.setBackgroundColor(resources.getColor(R.color.darkGray))
-            var dateTV = findViewById<TextView>(R.id.armyDayDateTV)
-            var amountOfSoldiersTV = findViewById<TextView>(R.id.amountOfSoldiersPerDayTV)
+                this.setBackgroundColor(resources.getColor(R.color.darkGray))
+                var dateTV = findViewById<TextView>(R.id.armyDayDateTV)
+                var dayTV = findViewById<TextView>(R.id.armyDaryDayOfWeek)
+                var amountOfSoldiersTV = findViewById<TextView>(R.id.amountOfSoldiersPerDayTV)
+                var localDate = LocalDate.parse(armyDay.date)
+                dayTV.text = Util.getDayOfWeek(localDate.dayOfWeek.toString())
+                dateTV.text = armyDay.date
+                amountOfSoldiersTV.text = "${x}/${mySoldiers.size}"
 
-            dateTV.text = armyDay.date
-            amountOfSoldiersTV.text = "${x}/${mySoldiers.size}"
 
-            var clicked = false
+                var clicked = false
                 setOnClickListener {
-                    if(!clicked) {
+                    if (!clicked) {
                         Util.currentDate.postValue(armyDay)
                         clicked = true
-                    }else{
+                    } else {
                         Util.currentDate.postValue(null)
                         clicked = false
                     }
                 }
+            }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        when(position){
+        if(position==0||position==armyDays.size+1)
+            return 0
 
-        }
-        return 0
+        return 1
     }
 
 

@@ -39,24 +39,20 @@ class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
         //
 
         setUpInternetObserver()
-        //seeIfLoggedIn()
+        seeIfLoggedIn()
         fragment = GreetingsFragment.newInstance(applicationContext,prefs)
         setFragement(fragment)
     }
 
     fun seeIfLoggedIn(){
-
-        FirebaseAuth.AuthStateListener() {
-            fun onAuthStateChanged(@NonNull firebaseAuth: FirebaseAuth) {
-                val user = FirebaseAuth.getInstance().currentUser
-                if (user != null)
-                {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-            }
+        val commandPath = prefs.getString("ArmyControlLoggedIn","")
+        if(commandPath!=""){
+            var intent = Intent(applicationContext, MainActivity::class.java)
+            intent.putExtra("commandPath",commandPath)
+            startActivity(intent)
+            finish()
         }
+
     }
     fun setUpInternetObserver(){
         Util.hasInternet.observe(this, Observer { hasInternet ->
@@ -85,11 +81,8 @@ class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
 
     override fun onButtonSelected() {
         val isVerified = prefs.getString("ArmyControlVerified","")
-        if(isVerified=="verified"){
-            setFragement(SignUpFragment.newInstance(applicationContext,prefs,false))
-        }else {
-            setFragement(SignUpFragment.newInstance(applicationContext,prefs,true))
-        }
+            setFragement(SignUpFragment.newInstance(applicationContext,prefs,isVerified!="verified"))
+
     }
 
 }

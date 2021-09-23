@@ -63,7 +63,7 @@ class ActivitiesViewModel(repository: Repository,context: Context):ViewModel() {
         activityReference.setValue(listOfAllArmyDays?.toList())
     }
 
-    fun saveActivity(oldActivity:ArmyActivity?,newActivity:ArmyActivity,soldiers: List<Soldier>){
+    fun saveActivity(oldActivity:ArmyActivity?,newActivity:ArmyActivity,soldiers: List<String>){
         var armyDay = Util.currentDate.value
         if(armyDay==null){
             var dayExists:ArmyDay? = null

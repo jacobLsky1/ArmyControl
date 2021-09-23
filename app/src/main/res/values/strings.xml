@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Army Control</string>
+    <string name="open">פתח</string>
+    <string name="close">סגור</string>
 </resources>

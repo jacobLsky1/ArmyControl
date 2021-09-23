@@ -153,6 +153,7 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
                     if(firstLogIn){
                         signUpFireBase(view,userEmail,userEmailPassword,userID,password)
                     }else{
+                        preferences.edit().putString("ArmyControlLoggedIn", commandPath).apply()
                         starArmyActivity(commandPath)
                     }
                 }else{
@@ -177,6 +178,7 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
             firebaseAuth.createUserWithEmailAndPassword(userEmail, userEmailPassword).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     preferences.edit().putString("ArmyControlVerified", "verified").apply()
+                    preferences.edit().putString("ArmyControlLoggedIn", commandPath).apply()
                     Log.i("Firebase", firebaseAuth.currentUser.uid)
                     val userID = firebaseAuth.currentUser.uid
                     //initData()
