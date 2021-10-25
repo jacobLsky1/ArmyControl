@@ -1,5 +1,6 @@
 package com.jacoblip.andriod.armycontrol.data.models
 
+import androidx.annotation.Keep
 import java.util.*
 
 data class  Soldier(
@@ -14,6 +15,7 @@ data class  Soldier(
         var civilianJob:String = "",
         var armyJobMap:String = "",
         var positionMap:String = "",
+        var entryCode:String = "",
         var isCommander:Boolean = false,
         var isLieutenant:Boolean = false,
         var pakal:List<String> = listOf(),

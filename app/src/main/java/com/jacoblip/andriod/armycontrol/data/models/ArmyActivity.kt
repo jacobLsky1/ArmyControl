@@ -2,9 +2,11 @@ package com.jacoblip.andriod.armycontrol.data.models
 
 import android.os.Build
 import android.provider.CalendarContract
+import androidx.annotation.Keep
 import androidx.annotation.RequiresApi
 import java.time.LocalDate
 import java.util.*
+
 
 data class ArmyActivity(
         var type:String = "",

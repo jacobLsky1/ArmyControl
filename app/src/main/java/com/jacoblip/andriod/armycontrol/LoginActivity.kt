@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.view.Window
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -16,9 +18,10 @@ import com.jacoblip.andriod.armycontrol.data.sevices.*
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.utilities.WifiReceiver
 import com.jacoblip.andriod.armycontrol.views.greeting.GreetingsFragment
+import com.jacoblip.andriod.armycontrol.views.greeting.NewGroupFragment
 import com.jacoblip.andriod.armycontrol.views.greeting.SignUpFragment
 
-class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
+class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks,GreetingsFragment.NewGroupCallBacks,NewGroupFragment.Callbacks {
 
     lateinit var wifiReceiver: WifiReceiver
     lateinit var fragment: Fragment
@@ -64,7 +67,8 @@ class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
     fun setFragement(fragment: Fragment){
             supportFragmentManager
                 .beginTransaction()
-                .add(R.id.login_fragment_container, fragment)
+                .replace(R.id.login_fragment_container, fragment)
+                .addToBackStack(null)
                 .commit()
     }
 
@@ -83,6 +87,15 @@ class LoginActivity:AppCompatActivity(), GreetingsFragment.Callbacks {
         val isVerified = prefs.getString("ArmyControlVerified","")
             setFragement(SignUpFragment.newInstance(applicationContext,prefs,isVerified!="verified"))
 
+    }
+
+    override fun onNewGroupButtonSelected() {
+        setFragement(NewGroupFragment.newInstance())
+    }
+
+    override fun onDataReady() {
+        val isVerified = prefs.getString("ArmyControlVerified","")
+        setFragement(SignUpFragment.newInstance(applicationContext,prefs,isVerified!="verified"))
     }
 
 }

@@ -36,7 +36,7 @@ import java.util.*
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
+class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPath:String):Fragment() {
 
     lateinit var activitesViewModel: ActivitiesViewModel
     lateinit var soldiersViewModel:SoldiersViewModel
@@ -55,10 +55,11 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
     lateinit var activityCompletedSwitch: Switch
     lateinit var activityCompletedTV:TextView
     var armyDay: ArmyDay? = null
+    var soldiersForActivity = mutableListOf<Soldier>()
 
-    var dateOfActivity:String = armyActivity?.date ?: ""
-    var activityStartTime:String = armyActivity?.startTime ?: ""
-    var activityEndTime:String = armyActivity?.endTime ?: ""
+    var dateOfActivity:String = ""
+    var activityStartTime:String =""
+    var activityEndTime:String =""
 
 
     override fun onDetach() {
@@ -77,6 +78,12 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
         val view = inflater.inflate(R.layout.a_fragment_add_new_activity, container, false)
         activitesViewModel = ViewModelProvider(requireActivity()).get(ActivitiesViewModel::class.java)
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
+
+        if(armyActivity!=null){
+            dateOfActivity = armyActivity!!.date
+            activityStartTime = armyActivity!!.startTime
+            activityEndTime = armyActivity!!.endTime
+        }
 
         setUpViews(view)
         setUpObservers()
@@ -124,28 +131,24 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
         Util.soldiersToAddToActivityLD.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 var allSoldiers = soldiersViewModel.listOfAllSoldiers
-                var soldiersForAdapter = mutableListOf<Soldier>()
                 for(soldier in allSoldiers!!){
                     if(it.contains(soldier!!.idNumber))
-                        soldiersForAdapter.add(soldier)
+                        soldiersForActivity.add(soldier)
                 }
-                participantsRV.adapter = AddSoldierToActivityAdapter(soldiersForAdapter)
-                (participantsRV.adapter as AddSoldierToActivityAdapter).notifyDataSetChanged()
+                participantsRV.adapter = AddSoldierToActivityAdapter(soldiersForActivity)
             }
         })
     }
 
     private fun setUpUI(hasActivity: Boolean){
-        dateOfActivity = armyActivity?.date ?: ""
-        activityStartTime = armyActivity?.startTime?:""
-        activityEndTime = armyActivity?.endTime?:""
+
         if(hasActivity){
             var position = Util.activityTypes.indexOf(armyActivity!!.type)
             activityTypeSpinner.setSelection(position)
             activityNameET.setText(armyActivity!!.name, TextView.BufferType.EDITABLE)
-            dateTV.text = armyActivity!!.date
-            startTimeTV.text = armyActivity!!.startTime
-            endTimeTV.text = armyActivity!!.endTime
+            dateTV.text = dateOfActivity
+            startTimeTV.text = activityStartTime
+            endTimeTV.text = activityEndTime
             activityLocationET.setText(armyActivity!!.location, TextView.BufferType.EDITABLE);
             Util.soldiersToAddToActivityLD.postValue(armyActivity?.attendees)
             activityCompletedSwitch.isChecked = armyActivity!!.completed
@@ -158,6 +161,7 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
             dateTV.text = armyDay?.date ?: "הכנס תאריך"
             startTimeTV.text = "הכנס שעת התחלה"
             endTimeTV.text = "הכנס שעת סיום"
+            activityCompletedTV.text = "לא"
         }
     }
 
@@ -177,9 +181,9 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
         saveActivityButton.setOnClickListener {
             var type = activityTypeSpinner.selectedItem.toString()
             var name = activityNameET.text.toString()
-            var date = dateOfActivity
-            var startTime = activityStartTime
-            var endTime = activityEndTime
+            var date = dateTV.text.toString()
+            var startTime = startTimeTV.text.toString()
+            var endTime = endTimeTV.text.toString()
             var location = activityLocationET.text.toString()
             var isCompleted = activityCompletedSwitch.isChecked
             if(type.isEmpty()||name.isEmpty()||date.isEmpty()||startTime.isEmpty()||endTime.isEmpty()){
@@ -214,6 +218,27 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
                 )
                 var pickedDate = LocalDate.of(day.year, day.month, day.dayOfMonth)
                 pickedDate = pickedDate.plusMonths(1)
+                if(commandPath!="1"){
+                    val date = pickedDate.toString()
+                    val days = activitesViewModel.listOfArmyDays.value
+                    var newDay = true
+                    if (days != null) {
+                        for(day in days){
+                            if(day!!.date==date) {
+                                newDay = false
+                                break
+                            }
+                        }
+                    }
+                    if(newDay){
+                        Toast.makeText(
+                                requireContext(),
+                                "אין לך אפשרות להגדיר יום שירות חדש",
+                                Toast.LENGTH_LONG
+                        ).show()
+                        return@SingleDayPickCallback
+                    }
+                }
                 if(pickedDate.isBefore(nowDate)){
                     Toast.makeText(
                         requireContext(),
@@ -329,20 +354,27 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
         var signAllCB = dialogView.findViewById(R.id.signEveryOneCB) as CheckBox
         var signNoOneCB =     dialogView.findViewById(R.id.signNoOneCB) as CheckBox
         val cancelButton = dialogView.findViewById<Button>(R.id.cancelButton)
-        dialogDateTV.text = dateTV.text
+        var name = activityNameET.text.toString()
+        if(name.isEmpty()) name = "פעילות"
+        dialogDateTV.text = "${dateTV.text} - $name"
 
         signAllCB.isChecked = false
-        AddingSoldierHelper.soldiersToAdd = mutableListOf()
+        if(soldiersForActivity.isNotEmpty()){
+            AddingSoldierHelper.soldiersToAdd = getIDS(soldiersForActivity).toMutableList()
+        }else {
+            AddingSoldierHelper.soldiersToAdd = mutableListOf()
+        }
         soldiersRV.adapter  = AddSoldierToDayAdapter(
                 requireContext(),
                 allSoldiers as List<Soldier>,
                 false,
-                true
+                true,
+                Util.soldiersToAddToActivityLD.value
         )
 
 
         val alertDialog = AlertDialog.Builder(requireContext())
-        alertDialog.setView(dialogView).setCancelable(false)
+        alertDialog.setView(dialogView).setCancelable(true)
 
         val dialog = alertDialog.create()
         dialog.show()
@@ -351,12 +383,14 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
 
             if(isChecked) {
                 signNoOneCB.isChecked = false
-                AddingSoldierHelper.soldiersToAdd.addAll(allSoldiers as List<Soldier>)
+                AddingSoldierHelper.soldiersToAdd = mutableListOf()
+                AddingSoldierHelper.soldiersToAdd.addAll(getIDS(allSoldiers).toMutableList())
                 soldiersRV.adapter  = AddSoldierToDayAdapter(
                     requireContext(),
-                    allSoldiers as List<Soldier>,
+                    allSoldiers ,
                     true,
-                    true
+                    true,
+                        null
                 )
             }
         }
@@ -366,39 +400,44 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?):Fragment() {
                 AddingSoldierHelper.soldiersToAdd = mutableListOf()
                 soldiersRV.adapter  = AddSoldierToDayAdapter(
                     requireContext(),
-                    allSoldiers as List<Soldier>,
+                    allSoldiers ,
                     false,
-                    true
+                    true,
+                        null
                 )
             }
         }
 
         continueButton.setOnClickListener {
-            (soldiersRV.adapter as BaseAdapter).notifyDataSetChanged()
-            dialog.dismiss()
-            var soldiers = getArmySoldiersFromAdapter(soldiersRV, allSoldiers)
+
+            var soldiers = AddingSoldierHelper.soldiersToAdd
             var soldieridNumbers = mutableListOf<String>()
 
             for(soldier in soldiers)
-                soldieridNumbers.add(soldier.idNumber)
+                soldieridNumbers.add(soldier)
 
             Util.soldiersToAddToActivityLD.postValue(soldieridNumbers)
+            soldiersForActivity = mutableListOf()
+
+            dialog.dismiss()
         }
 
         cancelButton.visibility = View.GONE
     }
 
-    fun getArmySoldiersFromAdapter(listView: ListView, soldiers: List<Soldier?>?):List<Soldier>{
 
-        var list = AddingSoldierHelper.soldiersToAdd
-        AddingSoldierHelper.soldiersToAdd = mutableListOf()
-        return list
+    fun getIDS(list:List<Soldier>):List<String>{
+        var ids = mutableListOf<String>()
+        for(soldier in list){
+            ids.add(soldier.idNumber)
+        }
+        return ids
     }
 
 
     companion object{
-        fun newInstance(armyActivity: ArmyActivity?):AddOrEditNewActivityFragment{
-            return AddOrEditNewActivityFragment(armyActivity)
+        fun newInstance(armyActivity: ArmyActivity?,commandPath:String):AddOrEditNewActivityFragment{
+            return AddOrEditNewActivityFragment(armyActivity,commandPath)
         }
     }
 }

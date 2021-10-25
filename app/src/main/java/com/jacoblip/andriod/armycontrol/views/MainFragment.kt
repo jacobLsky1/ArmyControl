@@ -43,7 +43,6 @@ class MainFragment(commandPath: String):Fragment() {
     var fragmentReady:MutableLiveData<Boolean> = MutableLiveData()
     var fabClicked:Boolean = false
     lateinit var soldiersViewModel:SoldiersViewModel
-    lateinit var currentFragment:Fragment
 
     private val rotateOpenAnim:Animation by lazy { AnimationUtils.loadAnimation(requireContext(), R.anim.rotate_open_anim) }
     private val rotateCloseAnim:Animation by lazy { AnimationUtils.loadAnimation(requireContext(), R.anim.rotate_close_anim) }
@@ -79,47 +78,51 @@ class MainFragment(commandPath: String):Fragment() {
             bottomNavigationView = findViewById(R.id.bottomNavigationMenu)
             bottomNavigationView.background = null
             bottomNavigationView.menu.getItem(1).isEnabled = false
+            addSoldierFAB.shrink()
+            addActivityFAB.shrink()
 
 
 
             bottomNavigationView.setOnNavigationItemSelectedListener {
                 when(it.itemId){
                     R.id.personnelTab -> {
-                        setFragment(soldiersFragment)
+                        Util.inActivitiesFragment = false
+                        childFragmentManager
+                                .beginTransaction()
+                                .replace(R.id.secondary_fragment_container, soldiersFragment)
+                                .addToBackStack(null)
+                                .commit()
                     }
                     R.id.timeLineTab -> {
-                        setFragment(activiteiesFragment)
+                        Util.inActivitiesFragment = true
+                        childFragmentManager
+                                .beginTransaction()
+                                .replace(R.id.secondary_fragment_container, activiteiesFragment)
+                                .addToBackStack(null)
+                                .commit()
                     }
                 }
                 true
             }
-            currentFragment = soldiersFragment
+           // currentFragment = soldiersFragment
         }
         setUpObservers()
-        setFragment(soldiersFragment)
+        setFragment()
         return view
     }
 
-    fun setFragment(fragment: Fragment){
+    private fun setFragment(){
 
-        if(currentFragment == soldiersFragment && fragment== activiteiesFragment) {
-            childFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.secondary_fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit()
+        if(Util.inActivitiesFragment) {
+           bottomNavigationView.selectedItemId = R.id.timeLineTab
 
-            currentFragment = activiteiesFragment
+            Util.inActivitiesFragment=true
         }else{
-            childFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.secondary_fragment_container, fragment)
-                    .commit()
-            currentFragment = soldiersFragment
+            bottomNavigationView.selectedItemId = R.id.personnelTab
         }
 
     }
-    fun setUpObservers(){
+   private fun setUpObservers(){
         fragmentReady.observe(viewLifecycleOwner, Observer {
             if (it) {
 
@@ -208,7 +211,7 @@ class MainFragment(commandPath: String):Fragment() {
                } else false
 
                var soldier = Soldier(name, idNumber, "", "", false, "",
-                       listOf(), phone, job, armyJob, soldierPosition, isCommander, isLieutenant, listOf(), listOf())
+                       listOf(), phone, job, armyJob, soldierPosition, "",isCommander, isLieutenant, listOf(), listOf())
 
                soldiersViewModel.addSoldier(soldier)
                dialog.dismiss()

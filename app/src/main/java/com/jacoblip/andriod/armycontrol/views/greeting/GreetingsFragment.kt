@@ -14,24 +14,31 @@ class GreetingsFragment(context: Context,var prefs:SharedPreferences):Fragment()
 
     var mycontext = context
     lateinit var getStartedButton:Button
+    lateinit var newGroupButton:Button
     var isVerified = false
 
     interface Callbacks {
         fun onButtonSelected()
     }
+    interface NewGroupCallBacks{
+        fun onNewGroupButtonSelected()
+    }
 
 
     private var callbacks: Callbacks? = null
+    private var newCallbacks:NewGroupCallBacks? = null
 
     //the callback functions
     override fun onAttach(context: Context) {
         super.onAttach(context)
         callbacks = context as Callbacks?
+        newCallbacks = context as NewGroupCallBacks
     }
 
     override fun onDetach() {
         super.onDetach()
         callbacks = null
+        newCallbacks = null
     }
 
     override fun onCreateView(
@@ -41,8 +48,12 @@ class GreetingsFragment(context: Context,var prefs:SharedPreferences):Fragment()
     ): View? {
         val view = inflater.inflate(R.layout.m_fragment_greetings_army_control,container,false)
         getStartedButton = view.findViewById(R.id.getStartedButton)
+        newGroupButton = view.findViewById(R.id.newGroupButton)
         getStartedButton.setOnClickListener {
             callbacks?.onButtonSelected()
+        }
+        newGroupButton.setOnClickListener {
+            newCallbacks?.onNewGroupButtonSelected()
         }
         return view
     }

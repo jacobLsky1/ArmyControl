@@ -1,6 +1,7 @@
 package com.jacoblip.andriod.armycontrol.views.adapters
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +13,9 @@ import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.databinding.AAddSoldiersForDayBinding.inflate
 import com.jacoblip.andriod.armycontrol.utilities.AddingSoldierHelper
 
-class AddSoldierToDayAdapter(var context: Context, var allSolders:List<Soldier>, var checkEveryOne:Boolean, var addToActivity:Boolean):BaseAdapter() {
-    private val inflater: LayoutInflater
-            = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+class AddSoldierToDayAdapter(var context: Context, var allSolders:List<Soldier>, var checkEveryOne:Boolean, var addToActivity:Boolean,var existingSoldiers:List<String>?):BaseAdapter() {
 
+    private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getCount() = allSolders.size
 
@@ -36,17 +36,38 @@ class AddSoldierToDayAdapter(var context: Context, var allSolders:List<Soldier>,
             val idNumber = findViewById<TextView>(R.id.idNumberTV)
             val pakal = findViewById<TextView>(R.id.listOfPakalimTV)
 
-            nameCB.text = soldier.name
-            stationMap.text = com.jacoblip.andriod.armycontrol.utilities.Util.getPositionByCode(soldier.positionMap)
-            idNumber.text = com.jacoblip.andriod.armycontrol.utilities.Util.getArmyJobByCode(soldier.armyJobMap)
-            pakal.text = soldier.pakal.toString()
+            nameCB.apply {
+                text = soldier.name
+                setTextColor(Color.WHITE)
+            }
 
+            stationMap.apply {
+                text = com.jacoblip.andriod.armycontrol.utilities.Util.getPositionByCode(soldier.positionMap)
+                setTextColor(Color.WHITE)
+            }
+            idNumber.apply {
+                text = com.jacoblip.andriod.armycontrol.utilities.Util.getArmyJobByCode(soldier.armyJobMap)
+                setTextColor(Color.WHITE)
+            }
+            pakal.apply {
+                text = soldier.pakal.toString()
+                setTextColor(Color.WHITE)
+            }
+
+            if(existingSoldiers==null)
             nameCB.isChecked = checkEveryOne
+            else{
+                for(mySoldier in existingSoldiers!!){
+                    if(soldier.idNumber==mySoldier){
+                        nameCB.isChecked = true
+                    }
+                }
+            }
             nameCB.setOnCheckedChangeListener{it,isChecked->
                 if(isChecked){
-                    AddingSoldierHelper.soldiersToAdd.add(soldier)
+                    AddingSoldierHelper.soldiersToAdd.add(soldier.idNumber)
                 }else{
-                    AddingSoldierHelper.soldiersToAdd.remove(soldier)
+                    AddingSoldierHelper.soldiersToAdd.remove(soldier.idNumber)
                 }
             }
         }

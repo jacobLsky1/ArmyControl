@@ -5,35 +5,44 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.database.FirebaseDatabase
 import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
+import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.*
+import com.jacoblip.andriod.armycontrol.utilities.AddingSoldierHelper
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.utilities.WifiReceiver
 import com.jacoblip.andriod.armycontrol.views.*
 import com.jacoblip.andriod.armycontrol.views.activities.AddOrEditNewActivityFragment
 import com.jacoblip.andriod.armycontrol.views.activities.MainActivitiesFragment
+import com.jacoblip.andriod.armycontrol.views.adapters.AddSoldierToDayAdapter
 import com.jacoblip.andriod.armycontrol.views.soldiers.*
+import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : AppCompatActivity()
         , MainSoldiersFragment.ButtonCallbacks, MainSoldiersFragment.SoldierCallbacks,
          MainSoldiersFragment.SoldierSelectedFromRV, SoldierFragment.EditSoldierCallbacks,
-        MainActivitiesFragment.OnActivityPressedCallBacks, MainFragment.AddActivityCallBacks{
+        MainActivitiesFragment.OnActivityPressedCallBacks, MainFragment.AddActivityCallBacks,
+        MainActivitiesFragment.OnActivitySelectedFromRVCallBacks,MainActivitiesFragment.OnDayLongPressCallBacks{
 
     lateinit var toggle: ActionBarDrawerToggle
     lateinit var navView: NavigationView
@@ -46,7 +55,10 @@ class MainActivity : AppCompatActivity()
     lateinit var removeButton: Button
     lateinit var preferences : SharedPreferences
     var listOfSoldiersSelected = mutableListOf<Soldier>()
+    var listOfActivitysSelected = mutableListOf<ArmyActivity>()
     var commandPath = "1"
+    var armyControlGroup = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +69,8 @@ class MainActivity : AppCompatActivity()
         preferences = getSharedPreferences("armyControl", Context.MODE_PRIVATE)
         var intent = intent
         commandPath = intent.getStringExtra("commandPath").toString()
+        armyControlGroup = preferences.getString("ArmyControlGroup","").toString()
+        Util.groupRef = FirebaseDatabase.getInstance().getReference(armyControlGroup)
         Util.userCommandPath = commandPath
 
         val toolbar: Toolbar = findViewById(R.id.tool_bar)
@@ -79,9 +93,20 @@ class MainActivity : AppCompatActivity()
         wifiReceiver = WifiReceiver()
         setUpObservers()
         removeButton.setOnClickListener {
-            soldiersViewModel.removeSoldiers(listOfSoldiersSelected.toList())
-            Util.inSelectionMode.postValue(false)
-            listOfSoldiersSelected = mutableListOf()
+            if(listOfSoldiersSelected.isNotEmpty()) {
+                activitiesViewModel.removeSoldiersFromDays(listOfSoldiersSelected.toList())
+                soldiersViewModel.removeSoldiers(listOfSoldiersSelected.toList())
+                soldiersViewModel.soldiersDeleted.postValue(true)
+                Util.inSelectionMode.postValue(false)
+                listOfSoldiersSelected = mutableListOf()
+            }
+            if(listOfActivitysSelected.isNotEmpty()){
+                soldiersViewModel.removeActivitiesFromSoldiers(listOfActivitysSelected.toList())
+                activitiesViewModel.removeActivities(listOfActivitysSelected.toList(),Util.currentDate.value!!)
+                activitiesViewModel.activitiesDeleted.postValue(true)
+                Util.inSelectionMode.postValue(false)
+                listOfActivitysSelected = mutableListOf()
+            }
         }
         fragment = commandPath?.let { MainFragment.newInstance(it) }!!
         setFragement(fragment)
@@ -91,9 +116,21 @@ class MainActivity : AppCompatActivity()
         Util.inSelectionMode.observe(this, Observer {
             if(it){
                 removeButton.visibility = View.VISIBLE
+                if(Util.inActivitiesFragment){
+                    removeButton.text = "הסר פעילויות"
+                }else{
+                    removeButton.text = "הסר חיילים"
+                }
             }else{
                 removeButton.visibility = View.GONE
             }
+        })
+
+        Util.currentDate.observe(this, Observer {
+                if(listOfActivitysSelected.isNotEmpty()){
+                    listOfActivitysSelected = mutableListOf()
+                    Util.inSelectionMode.postValue(false)
+                }
         })
     }
 
@@ -163,6 +200,8 @@ class MainActivity : AppCompatActivity()
         var fragment = soldiersViewModel.currentFragment
         if(Util.inSelectionMode.value!!){
             Util.inSelectionMode.postValue(false)
+            listOfActivitysSelected = mutableListOf()
+            listOfSoldiersSelected = mutableListOf()
 
             if(fragment is RVSoldiersFragment) {
                 fragment.onBackPressed()
@@ -208,7 +247,7 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onActivityPressed(activity:ArmyActivity?) {
-        fragment = AddOrEditNewActivityFragment.newInstance(activity)
+        fragment = AddOrEditNewActivityFragment.newInstance(activity,commandPath)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.main_fragment_container, fragment)
@@ -249,6 +288,109 @@ class MainActivity : AppCompatActivity()
             return true
         return super.onOptionsItemSelected(item)
     }
+
+    override fun onActivitySelectedFromRV(activity: ArmyActivity,addActivity:Boolean) {
+        if (addActivity) {
+            listOfActivitysSelected.add(activity)
+        } else {
+            listOfActivitysSelected.remove(activity)
+        }
+        if(listOfActivitysSelected.size==0)
+            Util.inSelectionMode.postValue(false)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onDayLongPress(it: ArmyDay?) {
+        val armyDay = it!!
+        var allSoldiers = soldiersViewModel.listOfPersonalSoldiers.value
+        val localDate = LocalDate.parse(armyDay!!.date)
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.a_add_soldiers_for_day, null)
+        var dateTV = dialogView.findViewById(R.id.dayTV) as TextView
+        val continueButton = dialogView.findViewById(R.id.commitButton) as Button
+        val deleteDayButton = dialogView.findViewById(R.id.deleteDayButton) as Button
+        var soldiersRV = dialogView.findViewById(R.id.soldiersToAddRV) as ListView
+        var signAllCB = dialogView.findViewById(R.id.signEveryOneCB) as CheckBox
+        var signNoOneCB =     dialogView.findViewById(R.id.signNoOneCB) as CheckBox
+        val cancelButton = dialogView.findViewById<Button>(R.id.cancelButton)
+        dateTV.text = "${Util.getDayOfWeek(localDate.dayOfWeek.toString())} - ${armyDay.date}"
+        deleteDayButton.isVisible = true
+
+        val alertDialog = AlertDialog.Builder(this@MainActivity)
+        alertDialog.setView(dialogView).setCancelable(false)
+
+        val dialog = alertDialog.create()
+        dialog.show()
+        AddingSoldierHelper.soldiersToAdd = mutableListOf()
+
+        signNoOneCB.isChecked = true
+
+        if(armyDay.listOfSoldiers.isNotEmpty()) {
+            AddingSoldierHelper.soldiersToAdd = armyDay.listOfSoldiers.toMutableList()
+        }
+        soldiersRV.adapter  = AddSoldierToDayAdapter(
+            applicationContext,
+            allSoldiers as List<Soldier>,
+            false,
+            false,
+            armyDay.listOfSoldiers.toMutableList()
+        )
+
+        signAllCB.setOnCheckedChangeListener { checkBox, isChecked ->
+            if(isChecked) {
+                signNoOneCB.isChecked = false
+                AddingSoldierHelper.soldiersToAdd = mutableListOf()
+                AddingSoldierHelper.soldiersToAdd.addAll(getIDS(allSoldiers))
+                soldiersRV.adapter  = AddSoldierToDayAdapter(
+                    applicationContext,
+                    allSoldiers as List<Soldier>,
+                    true,
+                    false
+                    ,null
+                )
+            }
+        }
+        signNoOneCB.setOnCheckedChangeListener { checkBox, isChecked ->
+            if(isChecked) {
+                signAllCB.isChecked = false
+                AddingSoldierHelper.soldiersToAdd = mutableListOf()
+                soldiersRV.adapter  = AddSoldierToDayAdapter(
+                    applicationContext,
+                    allSoldiers as List<Soldier>,
+                    false,
+                    false,
+                    null
+                )
+            }
+        }
+
+        continueButton.setOnClickListener {
+            var listOfSoldiersToAdd = AddingSoldierHelper.soldiersToAdd
+            val editedArmyDay = ArmyDay(armyDay.date, listOf(), listOfSoldiersToAdd.toList())
+            AddingSoldierHelper.soldiersToAdd = mutableListOf()
+                activitiesViewModel.editArmyDay(editedArmyDay)
+                dialog.dismiss()
+        }
+
+       deleteDayButton.setOnClickListener {
+            AddingSoldierHelper.soldiersToAdd = mutableListOf()
+            activitiesViewModel.deleteArmyDay(armyDay)
+            dialog.dismiss()
+        }
+        cancelButton.setOnClickListener {
+            AddingSoldierHelper.soldiersToAdd = mutableListOf()
+            dialog.dismiss()
+        }
+    }
+
+    fun getIDS(list:List<Soldier>):List<String>{
+        var ids = mutableListOf<String>()
+        for(soldier in list){
+            ids.add(soldier.idNumber)
+        }
+        return ids
+    }
+
 
 
 }

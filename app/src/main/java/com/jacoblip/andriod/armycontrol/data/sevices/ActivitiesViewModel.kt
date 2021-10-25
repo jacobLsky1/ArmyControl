@@ -1,6 +1,8 @@
 package com.jacoblip.andriod.armycontrol.data.sevices
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,11 +12,11 @@ import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import java.time.LocalDate
-
+@RequiresApi(Build.VERSION_CODES.O)
 class ActivitiesViewModel(repository: Repository,context: Context):ViewModel() {
 
-    private var activityReference = FirebaseDatabase.getInstance().getReference("ימי שירות")
-    private var soldiersReference = FirebaseDatabase.getInstance().getReference("חיילים")
+    private var activityReference = Util.groupRef.child("service days")
+    private var soldiersReference = Util.groupRef.child("soldiers")
 
     private var listOfAllArmyDays:MutableList<ArmyDay?>? = mutableListOf()
 
@@ -22,18 +24,22 @@ class ActivitiesViewModel(repository: Repository,context: Context):ViewModel() {
     private var _listOfArmyDays = MutableLiveData<List<ArmyDay?>?>()
     var listOfArmyDays : LiveData<List<ArmyDay?>?> =_listOfArmyDays
 
+    var activitiesDeleted : MutableLiveData<Boolean> = MutableLiveData(false)
+
     init {
         getAllArmyDays()
     }
 
     private fun getAllArmyDays(){
         val menuListener = object : ValueEventListener {
+
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val t: GenericTypeIndicator<List<ArmyDay?>?> = object : GenericTypeIndicator<List<ArmyDay?>?>() {}
                 listOfAllArmyDays = dataSnapshot.getValue(t)?.toMutableList()
                 if(listOfAllArmyDays==null){
                     listOfAllArmyDays = mutableListOf()
                 }
+                listOfAllArmyDays!!.sortBy { LocalDate.parse(it!!.date)  }
                 _listOfArmyDays.postValue(listOfAllArmyDays)
             }
 
@@ -45,15 +51,18 @@ class ActivitiesViewModel(repository: Repository,context: Context):ViewModel() {
     }
 
     fun addArmyDays(days:List<ArmyDay>){
+        var indexsForRmoval = mutableListOf<Int>()
         var armyDays = days.toMutableList()
         for(i in armyDays.indices){
             var newDay = armyDays[i]
             for(existingArmyDay in listOfAllArmyDays!!){
                 if(newDay.date==existingArmyDay?.date){
-                    listOfAllArmyDays!![listOfAllArmyDays!!.indexOf(existingArmyDay)] = newDay
-                     armyDays.removeAt(i)
+                     indexsForRmoval.add(i)
                 }
             }
+        }
+        for(i in indexsForRmoval){
+            armyDays.removeAt(i)
         }
         listOfAllArmyDays?.addAll(armyDays)
         listOfAllArmyDays?.sortedBy {
@@ -108,6 +117,69 @@ class ActivitiesViewModel(repository: Repository,context: Context):ViewModel() {
         soldiersReference.setValue(allSoldiers)
         activityReference.setValue(listOf<ArmyDay>())
         Util.currentDate.postValue(null)
+    }
+
+    fun removeActivities(activities:List<ArmyActivity>,armyDay: ArmyDay){
+       var armyDayActivities = armyDay.activities.toMutableList()
+
+        for(activity in activities){
+            armyDayActivities.remove(activity)
+        }
+        for(i in listOfAllArmyDays!!.indices){
+            var curDay = listOfAllArmyDays!![i]
+            if(curDay?.date==armyDay.date){
+                listOfAllArmyDays!![i]!!.activities = armyDayActivities
+                break
+            }
+        }
+        activityReference.setValue(listOfAllArmyDays?.toList())
+    }
+
+    fun editArmyDay(editedArmyDay:ArmyDay){
+        for(day in listOfAllArmyDays!!){
+            if(editedArmyDay.date==day!!.date){
+                listOfAllArmyDays!![listOfAllArmyDays!!.indexOf(day)] = editedArmyDay
+                break
+            }
+        }
+        activityReference.setValue(listOfAllArmyDays?.toList())
+    }
+
+    fun deleteArmyDay(armyDay: ArmyDay){
+        listOfAllArmyDays!!.remove(armyDay)
+        activityReference.setValue(listOfAllArmyDays?.toList())
+    }
+
+    fun updateSoldierIDForDays(oldID:String,newID:String){
+        if(listOfAllArmyDays?.size!=0){
+            for(day in listOfAllArmyDays!!){
+                if(day!!.listOfSoldiers.contains(oldID)){
+                    var list = day!!.listOfSoldiers.toMutableList()
+                    list[day!!.listOfSoldiers.indexOf(oldID)] = newID
+                    day.listOfSoldiers = list.toList()
+                }
+            }
+            activityReference.setValue(listOfAllArmyDays?.toList())
+        }
+    }
+
+    fun removeSoldiersFromDays(soldiers:List<Soldier>){
+        if(listOfAllArmyDays?.size!=0) {
+            for (soldier in soldiers) {
+                for (day in listOfAllArmyDays!!){
+                    if(day!!.listOfSoldiers.contains(soldier.idNumber)){
+                        for(activity in day!!.activities){
+                            var list = activity.attendees.toMutableList()
+                            if(list.contains(soldier.idNumber)){
+                                list.remove(soldier.idNumber)
+                            }
+                        }
+                        var list = day!!.listOfSoldiers.toMutableList()
+                        list.remove(soldier.idNumber)
+                    }
+                }
+            }
+        }
     }
 
 }

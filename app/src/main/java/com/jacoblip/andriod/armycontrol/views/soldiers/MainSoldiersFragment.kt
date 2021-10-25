@@ -24,8 +24,10 @@ import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.ActivitiesViewModel
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.utilities.LinearLayoutHelper
+import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.adapters.SoldiersByDateAdapter
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
+import java.time.LocalDate
 
 
 class MainSoldiersFragment(var commandPath: String):Fragment() {
@@ -89,15 +91,17 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
 
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
         activityViewModel = ViewModelProvider(requireActivity()).get(ActivitiesViewModel::class.java)
         soldiersViewModel.currentFragment = this
+        Util.inActivitiesFragment = false
         val view = inflater.inflate(R.layout.s_fragment_main_soldiers, container, false)
         view.apply {
             groupNameTV = findViewById(R.id.groupNameTV)
@@ -129,7 +133,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
             val itemSnapHelper: SnapHelper = LinearSnapHelper()
             itemSnapHelper.attachToRecyclerView(soildersByDateRV)
             //soildersByDateRV.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
-            soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers)
+            soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers,null)
 
             allSoldiersButton.setOnClickListener { buttonCallbacks!!.onButtonSelectedSelected(
                 1,
@@ -206,9 +210,12 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updateUI(){
-        soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers)
+        listOfArmyDays.toMutableList().sortBy { armyDay ->
+            LocalDate.parse(armyDay.date)
+        }
+        soildersByDateRV.adapter = SoldiersByDateAdapter(listOfArmyDays,listOfAllSoldiers,null)
         groupNameTV.text = group?.groupName
         val numSoldiers = soldiersViewModel.amountOfSoldiersPresent.toFloat()
         amountOfSoldiersPresentTV.text = "דו''ח 1:\n ${numSoldiers.toInt()}/${group?.amountOfSoldiers}"
@@ -223,7 +230,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setUpObservers(){
 
         soldiersViewModel.userGroup.observe(viewLifecycleOwner, Observer { it ->

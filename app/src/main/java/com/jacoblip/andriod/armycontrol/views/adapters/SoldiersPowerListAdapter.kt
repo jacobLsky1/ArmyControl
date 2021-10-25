@@ -3,6 +3,7 @@ package com.jacoblip.andriod.armycontrol.views.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
@@ -27,7 +28,9 @@ class SoldiersPowerListAdapter(var soldiers: List<Soldier>, var callbacks: MainS
             var idNumberTV = findViewById<TextView>(R.id.IdNumberTV)
             var usageTV = findViewById<TextView>(R.id.phoneNumberTV)
             var positionMap = findViewById<TextView>(R.id.amountOfActivitiesPassedTV)
+            var imageView = findViewById<ImageView>(R.id.soldierIcon)
 
+            imageView.visibility = View.GONE
             nameTV.text = soldier.name
             idNumberTV.text = "עיסוק אזרחי : ${soldier.civilianJob}"
             usageTV.text = soldier.pakal.toString()

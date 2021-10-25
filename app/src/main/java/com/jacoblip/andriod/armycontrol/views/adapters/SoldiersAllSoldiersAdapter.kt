@@ -33,12 +33,15 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
             var phoneTV = findViewById<TextView>(R.id.phoneNumberTV)
             var checkedImageView = findViewById<ImageView>(R.id.checkedImageView)
             var isHereTV = findViewById<TextView>(R.id.amountOfActivitiesPassedTV)
+            var stationMapTV = findViewById<TextView>(R.id.soldierStationMapTV)
+            stationMapTV.visibility = View.VISIBLE
 
             nameTV.text = soldier.name
             idNumberTV.text = soldier.idNumber
             phoneTV.text = soldier.phoneNumber
             Linkify.addLinks(phoneTV, Linkify.PHONE_NUMBERS);
             phoneTV.linksClickable = true;
+            stationMapTV.text = Util.getPositionByCode(soldier.positionMap)
 
             if(soldier.hasArrived){
                 isHereTV.visibility = View.VISIBLE

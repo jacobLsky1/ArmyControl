@@ -31,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add_24"
+            app:tint ="@color/white"
             app:layout_anchor="@id/bottomAppBar" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -40,8 +41,10 @@
             android:layout_gravity="center"
             android:clickable="true"
             android:focusable="true"
+            android:textColor="@color/white"
             android:visibility="invisible"
             android:text="הוסף חייל"
+            app:iconTint="@color/white"
             app:layout_anchor="@id/bottomAppBar"
             android:layout_marginBottom="180dp"
             app:layout_anchorGravity="center_horizontal"
@@ -54,8 +57,10 @@
             android:layout_gravity="center"
             android:clickable="true"
             android:focusable="true"
+            android:textColor="@color/white"
             android:visibility="invisible"
             android:text="הוסף פעילות"
+            app:iconTint="@color/white"
             android:layout_marginBottom="120dp"
             app:layout_anchor="@id/bottomAppBar"
             app:layout_anchorGravity="center_horizontal"

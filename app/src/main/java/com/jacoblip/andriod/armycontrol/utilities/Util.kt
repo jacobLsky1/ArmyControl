@@ -1,6 +1,9 @@
 package com.jacoblip.andriod.armycontrol.utilities
 
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
 import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.views.adapters.SoldiersByDateAdapter
@@ -186,6 +189,10 @@ class Util {
 
         var soldiersToAddToActivityLD:MutableLiveData<List<String>> = MutableLiveData(listOf())
         var currentDate:MutableLiveData<ArmyDay> = MutableLiveData()
+
+        var inActivitiesFragment = false
+
+        var groupRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("X")
     }
 
 

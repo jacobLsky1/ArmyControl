@@ -2,15 +2,19 @@ package com.jacoblip.andriod.armycontrol.views.adapters
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
+import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.activities.MainActivitiesFragment
 
-class ArmyActivityAdapter(var armyActivities:List<ArmyActivity>,var personalSoldiers:List<Soldier>,var callbacks:MainActivitiesFragment.OnActivityPressedCallBacks?):RecyclerView.Adapter<ArmyDateBySoldiersItemViewHolder>() {
+class ArmyActivityAdapter(var armyActivities:List<ArmyActivity>,var personalSoldiers:List<Soldier>,var callbacks:MainActivitiesFragment.OnActivityPressedCallBacks?,var longPressCallBacks:MainActivitiesFragment.OnActivitySelectedFromRVCallBacks?):RecyclerView.Adapter<ArmyDateBySoldiersItemViewHolder>() {
+    var listOfActivities:MutableList<ArmyActivity> = mutableListOf()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArmyDateBySoldiersItemViewHolder {
         when(viewType){
         }
@@ -37,6 +41,7 @@ class ArmyActivityAdapter(var armyActivities:List<ArmyActivity>,var personalSold
             var activityDate = findViewById<TextView>(R.id.itemArmyActvityDate)
             var activityTime = findViewById<TextView>(R.id.itemArmyActivityStart)
             var activityAttendees = findViewById<TextView>(R.id.itemArmyActivityAttendees)
+            var checkedImageView = findViewById<ImageView>(R.id.checkedActivityImageView)
 
             activityType.text = armyActivity.type
             activityName.text = armyActivity.name
@@ -45,9 +50,31 @@ class ArmyActivityAdapter(var armyActivities:List<ArmyActivity>,var personalSold
             activityTime.text = "${armyActivity.endTime} - ${armyActivity.startTime}"
             activityAttendees.text = "כמות חיילים : ${amountOfSoldiersAttending}"
 
-            if(callbacks!=null) {
+            if(callbacks!=null&&longPressCallBacks!=null) {
                 setOnClickListener {
-                    callbacks!!.onActivityPressed(armyActivity)
+                    if (Util.inSelectionMode.value!!) {
+                        if (!listOfActivities.contains(armyActivity)) {
+                            listOfActivities.add(armyActivity)
+                            longPressCallBacks!!.onActivitySelectedFromRV(armyActivity, true)
+                            checkedImageView.visibility = View.VISIBLE
+                        } else {
+                            listOfActivities.remove(armyActivity)
+                            longPressCallBacks!!.onActivitySelectedFromRV(armyActivity, false)
+                            checkedImageView.visibility = View.GONE
+                        }
+                    } else {
+                        callbacks!!.onActivityPressed(armyActivity)
+                    }
+                }
+
+                setOnLongClickListener {
+                    if (!Util.inSelectionMode.value!! && !listOfActivities.contains(armyActivity)) {
+                        Util.inSelectionMode.postValue(true)
+                        longPressCallBacks!!.onActivitySelectedFromRV(armyActivity, true)
+                        checkedImageView.visibility = View.VISIBLE
+                        listOfActivities.add(armyActivity)
+                    }
+                    true
                 }
             }
         }

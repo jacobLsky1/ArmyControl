@@ -12,13 +12,15 @@ import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Group
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
+import org.jetbrains.anko.doAsync
 import java.util.*
 
 
  class SoldiersViewModel(private val repository: Repository, var context: Context):ViewModel() {
 
-    private var groupReference = FirebaseDatabase.getInstance().getReference("פלוגה").child("ב")
-    private var soldiersReference = FirebaseDatabase.getInstance().getReference("חיילים")
+    private val groupReference = Util.groupRef.child("build")
+    private val soldiersReference = Util.groupRef.child("soldiers")
+     private val codesReference = Util.groupRef.child("entry codes")
     var currentFragment:Fragment? = null
 
      var soldierCommandPath:String = Util.userCommandPath
@@ -45,6 +47,8 @@ import java.util.*
 
     var listOfSoldiersWithPower:List<Soldier> = listOf()
     var listOfUserCommanders:List<Soldier> = listOf()
+
+     var soldiersDeleted : MutableLiveData<Boolean> = MutableLiveData(false)
 
 
      init {
@@ -141,8 +145,8 @@ import java.util.*
                 }
              }
              if(map.size==3){
-                 var num1 = map[map.lastIndex].toInt()
-                 var num2 = map[map.lastIndex-1].toInt()
+                 var num1 = map[map.lastIndex-1].toInt()
+                 var num2 = map[map.lastIndex].toInt()
                  if(num1==0&&num2==0){
                      if(soldier.isCommander){
                          subsubGroup1a.add(0,soldier)
@@ -201,7 +205,7 @@ import java.util.*
 
          }
 
-         val allGroups = listOf(headGroup,subGroup1,subsubGroup1a,subsubGroup1b,subsubGroup1c,subGroup2,subsubGroup2a,subsubGroup2b,subsubGroup2c,subGroup3,subsubGroup3a,subsubGroup3b,subsubGroup3c)
+         val allGroups = listOf(headGroup,subGroup1,subsubGroup1a,subsubGroup1b,subsubGroup1c,subGroup2,subsubGroup2a,subsubGroup2b,subsubGroup2c,subGroup3,subsubGroup3a,subsubGroup3b,subsubGroup3c,backGroup)
 
          for(group in allGroups){
              sortedSoldiers.addAll(group)
@@ -267,28 +271,41 @@ import java.util.*
         if(userSoldiers!=null && overSoldier.isCommander) {
             when (position.size) {
                 1 -> {
-                    userSoldiers.forEach { soldier ->
+                    for(soldier in userSoldiers) {
                         if (!soldier.equals(overSoldier)) {
                             if (overSoldier.positionMap.length == 1)
-                                if(soldier.armyJobMap.length == 2 || soldier.armyJobMap.length == 3)
+                                if(soldier.armyJobMap.length == 2 || soldier.armyJobMap.length == 3) {
                                     directSoldiers.add(soldier)
+                                    continue
+                                }
                             if (overSoldier.armyJobMap.length == 2)
                                 if( soldier.armyJobMap.length >= 3 )
-                                    if(soldier.armyJobMap[2]=='3')
+                                    if(soldier.armyJobMap[2]=='3'){
                                        directSoldiers.add(soldier)
+                                        continue
+                                    }
                         }
                     }
                 }
                 2 -> {
-                    userSoldiers.forEach { soldier ->
+                    for(soldier in userSoldiers) {
                         if (!soldier.equals(overSoldier)) {
-                            if (soldier.armyJobMap=="-${overSoldier.armyJobMap}" || (soldier.armyJobMap.length==5 && soldier.isCommander))
+                            if (soldier.armyJobMap=="-${overSoldier.armyJobMap}" ){
                                 directSoldiers.add(soldier)
+                                continue
+                            }
+                            if(soldier.armyJobMap.length==5 && soldier.isCommander){
+                                var char = soldier.armyJobMap[2]
+                                if(char==overSoldier.positionMap[2]){
+                                    directSoldiers.add(soldier)
+                                    continue
+                                }
+                            }
                         }
                     }
                 }
                 3 -> {
-                    userSoldiers.forEach { soldier ->
+                    for(soldier in userSoldiers) {
                         if(!soldier.equals(overSoldier)) {
                             var map = commandPathToArray(soldier.positionMap)
                             if (map.size == 3 && map[map.lastIndex] == position[position.lastIndex])
@@ -356,9 +373,12 @@ import java.util.*
 
     fun removeSoldiers(soldiers: List<Soldier>){
         var allSoldiers = listOfAllSoldiers?.toMutableList()
-
+        var deletedSoldiersIds = mutableListOf<String>()
         for(soldier in soldiers){
           allSoldiers?.remove(soldier)
+            if(soldier.entryCode!=""&&soldier.positionMap!="1") {
+                codesReference.child(soldier.idNumber).setValue(null)
+            }
          }
         soldiersReference.setValue(allSoldiers).addOnSuccessListener {
             Log.i("Repository", "added soldier")
@@ -402,6 +422,16 @@ import java.util.*
          allSoldiers[index] = newSoldier
          soldiersReference.setValue(allSoldiers).addOnSuccessListener {
              Log.i("viewModel","updated soldier")
+         }
+         if(oldSoldier.entryCode!=""&&newSoldier.entryCode==""){
+             codesReference.child(oldSoldier.idNumber).setValue(null)
+         }
+         if(oldSoldier.idNumber!=newSoldier.idNumber){
+             codesReference.child(oldSoldier.idNumber).setValue(null)
+         }
+
+         if(newSoldier.entryCode!=""){
+             codesReference.child(newSoldier.idNumber).setValue("${newSoldier.entryCode} ${newSoldier.positionMap}")
          }
          _nowSoldier.postValue(newSoldier)
      }
@@ -452,6 +482,27 @@ import java.util.*
              }
          }
          soldiersReference.setValue(allSoldiers)
+     }
+
+     fun removeActivitiesFromSoldiers(activities: List<ArmyActivity>){
+         var dataChanged = false
+         doAsync {
+             for (activity in activities) {
+                 if(listOfAllSoldiers?.size!=0) {
+                     for (soldier in listOfAllSoldiers!!){
+                         if(soldier!!.Activates.contains(activity)){
+                             var list = soldier!!.Activates.toMutableList()
+                             list.remove(activity)
+                             soldier.Activates = list.toList()
+                             dataChanged = true
+                         }
+                     }
+                 }
+             }
+             if(dataChanged) {
+                 soldiersReference.setValue(listOfAllSoldiers)
+             }
+         }
      }
 
 }

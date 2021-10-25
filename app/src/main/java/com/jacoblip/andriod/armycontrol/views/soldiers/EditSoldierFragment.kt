@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +14,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
+import com.jacoblip.andriod.armycontrol.data.sevices.ActivitiesViewModel
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import java.util.*
@@ -20,6 +22,7 @@ import java.util.*
 class EditSoldierFragment(val soldier: Soldier):Fragment() {
 
     lateinit var soldiersViewModel: SoldiersViewModel
+    lateinit var activitiesViewModel:ActivitiesViewModel
     var oldSoldier = soldier
     var isCommander:MutableLiveData<Boolean> = MutableLiveData(soldier.isCommander)
     var listOfUsages:MutableList<String> = mutableListOf()
@@ -38,6 +41,9 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
     lateinit var soldierHasArrivedTV:TextView
     lateinit var whyNotArrivingET:EditText
     lateinit var usageTV :TextView
+    lateinit var addEntryPermSwitch: Switch
+    lateinit var entryPermCode:EditText
+    lateinit var entryPermCodeTV:TextView
 
     lateinit var checkBox1:CheckBox
     lateinit var checkBox2:CheckBox
@@ -60,6 +66,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
+        activitiesViewModel = ViewModelProvider(requireActivity()).get(ActivitiesViewModel::class.java)
         soldiersViewModel.currentFragment = this
         val view= inflater.inflate(R.layout.s_fragment_edit_soldier,container,false)
         connectViews(view)
@@ -110,6 +117,9 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
             hasSoldierArrivedSwitch = findViewById(R.id.hasArrivedSwitch)
             soldierHasArrivedTV = findViewById(R.id.soldierHasArrivedTV)
             whyNotArrivingET = findViewById(R.id.editTextWhyNotArriving)
+            addEntryPermSwitch = findViewById(R.id.addPermSwitch)
+            entryPermCode = findViewById(R.id.editSoldierPermissionET)
+            entryPermCodeTV = findViewById(R.id.editSoldierPermissionTV)
             usageTV= findViewById(R.id.soldierUsageTV)
             checkBox1 = findViewById(R.id.checkBox1)
             checkBox2 = findViewById(R.id.checkBox2)
@@ -151,6 +161,23 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
             }
         }
 
+        if(Util.userCommandPath=="1"){
+            addEntryPermSwitch.isVisible = true
+        }
+
+        addEntryPermSwitch.setOnCheckedChangeListener { b, isChecked ->
+            if(isChecked){
+                entryPermCode.isVisible = true
+                entryPermCodeTV.isVisible = true
+                entryPermCode.setText(soldier.entryCode)
+            }else{
+                entryPermCode.isVisible = false
+                entryPermCodeTV.isVisible = false
+                entryPermCode.setText("")
+            }
+        }
+
+        addEntryPermSwitch.isChecked = soldier.entryCode!=""
 
         setUpCheckBoxs()
 
@@ -190,6 +217,9 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
             if (isValid) {
                 val newSoldier = makeNewSoldier()
                 soldiersViewModel.saveSoldier(newSoldier,oldSoldier)
+                if(newSoldier.idNumber!=oldSoldier.idNumber){
+                    activitiesViewModel.updateSoldierIDForDays(oldSoldier.idNumber,newSoldier.idNumber)
+                }
                 soldiersViewModel.swapOutNewSoldier(newSoldier)
                 requireActivity().supportFragmentManager.popBackStack()
             }else{
@@ -225,6 +255,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         val age = soldierAgeET.text.toString()
         val medData = soldierMedData.text.toString()
         val isCommander = isCommanderSwitch.isChecked
+        val entrycode = entryPermCode.text.toString()
         val jobMap = armyJobSpinner.selectedItem.toString()
         val posMap = positionSpinner.selectedItem.toString()
         val armyJob = Util.getArmyJobPosition(jobMap)
@@ -238,7 +269,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         if (job.isEmpty()) job = "לא עודכן"
 
 
-        return Soldier(name, idNum, age, medData, hasArrived, whyNotArv, listOfDatesOfService, phone, job, armyJob, soldierPosition, isCommander, isLieutenant, listOfUsages.toList(), listOfSoldierActivities)
+        return Soldier(name, idNum, age, medData, hasArrived, whyNotArv, listOfDatesOfService, phone, job, armyJob, soldierPosition,entrycode, isCommander, isLieutenant, listOfUsages.toList(), listOfSoldierActivities)
     }
 
 

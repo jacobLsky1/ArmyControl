@@ -18,13 +18,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.jacoblip.andriod.armycontrol.MainActivity
 import com.jacoblip.andriod.armycontrol.R
+import com.jacoblip.andriod.armycontrol.data.models.EntryRequest
 import com.jacoblip.andriod.armycontrol.utilities.ArmyData
+import com.jacoblip.andriod.armycontrol.utilities.Util
 
 @RequiresApi(Build.VERSION_CODES.O)
 class SignUpFragment(context: Context,var preferences: SharedPreferences,val firstLogIn:Boolean):Fragment() {
@@ -35,6 +34,7 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
     lateinit var userEmailPassword: TextInputEditText
     lateinit var userIDnumber: TextInputEditText
     lateinit var userPassword: TextInputEditText
+    lateinit var userGroupID: TextInputEditText
     lateinit var submitButton: Button
     lateinit var firebaseAuth: FirebaseAuth
     lateinit var progressBar: ProgressBar
@@ -60,6 +60,7 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
             progressBar = findViewById(R.id.progressBar)
             userEmailLayout = findViewById(R.id.userEmailLayout)
             userEmailPasswordLayout = findViewById(R.id.userEmailPasswordLayout)
+            userGroupID = findViewById(R.id.userGroup)
 
             if(!firstLogIn){
                 userEmailLayout.visibility = View.GONE
@@ -84,30 +85,39 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
     fun logIn(){
         val userID = userIDnumber.text.toString().trim()
         val password = userPassword.text.toString().trim()
+        val  groupID = userGroupID.text.toString().trim()
         val userEmail = ""
         val userEmailPassword = ""
         var error = 0
-        if (TextUtils.isEmpty(userID) || TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(userID) || TextUtils.isEmpty(password)||TextUtils.isEmpty(groupID)) {
             error = 1
         }
 
         when (error) {
             1 -> {
+                if(TextUtils.isEmpty(groupID) )
+                    userGroupID.error = "נא למלא את השדא"
                 if(TextUtils.isEmpty(userID) )
-                    userIDnumber.error = "must not be empty"
+                    userIDnumber.error = "נא למלא את השדא"
                 if(TextUtils.isEmpty(password))
-                    userPassword.error = "must not be empty"
+                    userPassword.error = "נא למלא את השדא"
                 progressBar.visibility = View.GONE
             }
         }
 
         if(error!=1){
-            view?.let {getPassword(it,userEmail,userEmailPassword,userID,password) }
+            view?.let {
+                var entryRequest = EntryRequest(it,userEmail,userEmailPassword,userID,password,groupID)
+                getGroup(entryRequest)
+            }
         }
     }
 
+
+
     fun signUp(){
 
+        val groupID = userGroupID.text.toString().trim()
         val userEmail = userEmail.text.toString().trim()
         val userEmailPassword = userEmailPassword.text.toString().trim()
         val userID = userIDnumber.text.toString().trim()
@@ -116,32 +126,61 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
 
 
 
-        if (TextUtils.isEmpty(userID) || TextUtils.isEmpty(password)|| TextUtils.isEmpty(userEmail)|| TextUtils.isEmpty(userEmailPassword)) {
+        if (TextUtils.isEmpty(userID) || TextUtils.isEmpty(password)|| TextUtils.isEmpty(userEmail)|| TextUtils.isEmpty(userEmailPassword)||TextUtils.isEmpty(groupID)) {
             error = 1
         }
 
         when (error) {
             1 -> {
                 if(TextUtils.isEmpty(userID) )
-                   userIDnumber.error = "must not be empty"
+                   userIDnumber.error = "נא למלא את השדא"
                 if(TextUtils.isEmpty(password))
-                    userPassword.error = "must not be empty"
+                    userPassword.error = "נא למלא את השדא"
                 if(TextUtils.isEmpty(userEmail) )
-                    userIDnumber.error = "must not be empty"
+                    userIDnumber.error = "נא למלא את השדא"
                 if(TextUtils.isEmpty(userEmailPassword))
-                    userPassword.error = "must not be empty"
+                    userPassword.error = "נא למלא את השדא"
+                if(TextUtils.isEmpty(groupID) )
+                    userGroupID.error = "נא למלא את השדא"
 
                 progressBar.visibility = View.GONE
             }
         }
 
         if(error!=1){
-            view?.let { getPassword(it,userEmail,userEmailPassword,userID,password) }
+            view?.let {
+                var entryRequest = EntryRequest(it,userEmail,userEmailPassword,userID,password,groupID)
+                getGroup(entryRequest)
+            }
         }
     }
 
-    fun getPassword(view: View,userEmail:String,userEmailPassword:String, userID:String, passwordInput: String){
-        var ref = FirebaseDatabase.getInstance().getReference("KeyPasswords").child(userID)
+    fun getGroup(entryRequest: EntryRequest){
+        var fbRef = FirebaseDatabase.getInstance().getReference("groupCodes").child(entryRequest.groupId)
+        val menuListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                var data = dataSnapshot!!.value
+                if(data!=null){
+                    var dataArr = data.toString().split(' ')
+                    val group = dataArr[1]+" "+dataArr[2]
+                    preferences.edit().putString("ArmyControlGroup",group).apply()
+                    val groupRef = FirebaseDatabase.getInstance().getReference(group)
+                    getPassword(entryRequest,groupRef)
+                }else{
+                    userGroupID.error = "אין מסגרת התואמת את הקוד"
+                }
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                // handle error
+            }
+        }
+        fbRef.addListenerForSingleValueEvent(menuListener)
+    }
+
+
+
+    fun getPassword(entryRequest: EntryRequest,groupRef:DatabaseReference){
+        var ref = groupRef.child("entry codes").child(entryRequest.userId)
 
         val menuListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -149,9 +188,9 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
                 var passwordData = data.toString().split(' ')
                 password = passwordData[0]
                 commandPath = passwordData[1]
-                if(password==passwordInput) {
+                if(password==entryRequest.userCode) {
                     if(firstLogIn){
-                        signUpFireBase(view,userEmail,userEmailPassword,userID,password)
+                        signUpFireBase(entryRequest)
                     }else{
                         preferences.edit().putString("ArmyControlLoggedIn", commandPath).apply()
                         starArmyActivity(commandPath)
@@ -170,22 +209,20 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
     }
 
 
-    fun signUpFireBase(view: View,userEmail:String,userEmailPassword:String, userID:String, passwordInput: String){
+    fun signUpFireBase(entryRequest: EntryRequest){
 
 
-            showMessage(view, "Authenticating...")
+            showMessage(entryRequest.view!!, "Authenticating...")
 
-            firebaseAuth.createUserWithEmailAndPassword(userEmail, userEmailPassword).addOnCompleteListener { task ->
+            firebaseAuth.createUserWithEmailAndPassword(entryRequest.email, entryRequest.emailPassword).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     preferences.edit().putString("ArmyControlVerified", "verified").apply()
                     preferences.edit().putString("ArmyControlLoggedIn", commandPath).apply()
                     Log.i("Firebase", firebaseAuth.currentUser.uid)
-                    val userID = firebaseAuth.currentUser.uid
-                    //initData()
                     starArmyActivity(commandPath)
 
                 } else {
-                    showMessage(view, "Error: ${task.exception?.message}")
+                    showMessage(entryRequest.view!!, "Error: ${task.exception?.message}")
                     progressBar.visibility = View.GONE
                 }
             }
@@ -196,33 +233,14 @@ class SignUpFragment(context: Context,var preferences: SharedPreferences,val fir
     fun starArmyActivity(commandPath:String){
         var intent = Intent(requireContext(), MainActivity::class.java)
         intent.putExtra("commandPath",commandPath)
+
         startActivity(intent)
         activity?.finish()
     }
 
 
-
-    fun initData(){
-        val soldierDbRef = FirebaseDatabase.getInstance().getReference("חיילים")
-        soldierDbRef.setValue(ArmyData.listOfSoldiers)
-
-
-        val dbRef = FirebaseDatabase.getInstance().getReference("פלוגה")
-        dbRef.child("ב").setValue(ArmyData.armyData)
-                        .addOnCompleteListener {task ->
-                            if(task.isSuccessful) {
-                              //  Toast.makeText(requireContext(), "new User formed", Toast.LENGTH_LONG).show()
-                                Log.i("signup","success")
-                            }else{
-                                view?.let { showMessage(it,"Error: ${task.exception?.message}") }
-                                progressBar.visibility = View.GONE
-                            }
-                        }
-
-    }
-
     fun showMessage(view:View, message: String){
-        Snackbar.make(view, message, Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show()
+        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
     }
 
     companion object{

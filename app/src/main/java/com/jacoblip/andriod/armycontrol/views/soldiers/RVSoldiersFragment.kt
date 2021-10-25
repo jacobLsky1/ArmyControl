@@ -72,8 +72,10 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
                     }
                     4 -> {
                         var allArmyDays = activitiesViewModel.listOfArmyDays.value
-                        var list:List<ArmyActivity> = getAllPassedActivities(allArmyDays)
-                        all_soldiers_RV.adapter = SoldiersOperationalListAdapter(it, callbacks, callbacksRV,list)
+                        if(allArmyDays==null){
+                            allArmyDays = emptyList()
+                        }
+                        all_soldiers_RV.adapter = SoldiersOperationalListAdapter(it, callbacks, callbacksRV,allArmyDays as List<ArmyDay>)
                     }
                 }
 
@@ -81,6 +83,12 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
                 noSoldiersFoundTV.isVisible = true
             }
 
+        })
+        soldiersViewModel.soldiersDeleted.observe(viewLifecycleOwner, Observer {
+            if(it){
+                all_soldiers_RV.invalidate()
+                soldiersViewModel.soldiersDeleted.postValue(false)
+            }
         })
     }
 
@@ -97,27 +105,14 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
             }
             4 -> {
                 var allArmyDays = activitiesViewModel.listOfArmyDays.value
-                var list:List<ArmyActivity> = getAllPassedActivities(allArmyDays)
-                all_soldiers_RV.adapter = SoldiersOperationalListAdapter(soldiersViewModel.listOfPersonalSoldiers.value!!, callbacks, callbacksRV,list)
+                if(allArmyDays==null){
+                    allArmyDays = emptyList()
+                }
+                all_soldiers_RV.adapter = SoldiersOperationalListAdapter(soldiersViewModel.listOfPersonalSoldiers.value!!, callbacks, callbacksRV,allArmyDays as List<ArmyDay>)
             }
         }
     }
 
-    fun getAllPassedActivities(days:List<ArmyDay?>?):List<ArmyActivity>{
-        var list:MutableList<ArmyActivity> = mutableListOf()
-        return if(days!=null){
-            for(i in days.indices){
-                var day = days[i]
-                for(j in day!!.activities.indices){
-                    var activity = day.activities[j]
-                    if(activity.completed){
-                        list.add(activity)
-                    }
-                }
-            }
-            list
-        }else emptyList()
-    }
 
 
 
