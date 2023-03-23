@@ -2,6 +2,7 @@ package com.jacoblip.andriod.armycontrol.views.soldiers
 
 import android.content.Context
 import android.os.Bundle
+import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -87,7 +88,7 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
         soldiersViewModel.listOfPersonalSoldiersForSoldier.observe(viewLifecycleOwner, Observer {
             if(it!=null){
                 directSoldiersOfSoldier = it
-                directSoldiersRV.adapter = SoldiersAllSoldiersAdapter(directSoldiersOfSoldier, callBacks,callBacks2!!)
+                directSoldiersRV.adapter = SoldiersAllSoldiersAdapter(directSoldiersOfSoldier, callBacks,callBacks2!!,null)
             }
         })
 
@@ -107,6 +108,8 @@ class SoldierFragment(var soldier: Soldier, var callBacks: MainSoldiersFragment.
         soldierIdNumber.text = soldier.idNumber
         soldierIsCommander.text = Util.getArmyJobByCode(soldier.armyJobMap)
         soldierPhoneNumber.text = soldier.phoneNumber
+        Linkify.addLinks(soldierPhoneNumber, Linkify.PHONE_NUMBERS);
+        soldierPhoneNumber.linksClickable = true;
         soldierCivilianJob.text = soldier.civilianJob
         soldierPosition.text = Util.getPositionByCode(soldier.positionMap)
         isSoldierHereTV.text = if(soldier.hasArrived) "כן" else "לא"

@@ -42,7 +42,8 @@ class MainActivity : AppCompatActivity()
         , MainSoldiersFragment.ButtonCallbacks, MainSoldiersFragment.SoldierCallbacks,
          MainSoldiersFragment.SoldierSelectedFromRV, SoldierFragment.EditSoldierCallbacks,
         MainActivitiesFragment.OnActivityPressedCallBacks, MainFragment.AddActivityCallBacks,
-        MainActivitiesFragment.OnActivitySelectedFromRVCallBacks,MainActivitiesFragment.OnDayLongPressCallBacks{
+        MainActivitiesFragment.OnActivitySelectedFromRVCallBacks,MainActivitiesFragment.OnDayLongPressCallBacks,
+        RVSoldiersFragment.SoldierArrivingCallbacks {
 
     lateinit var toggle: ActionBarDrawerToggle
     lateinit var navView: NavigationView
@@ -278,6 +279,11 @@ class MainActivity : AppCompatActivity()
                         exitDialog()
                         true
                     }
+
+                    R.id.addSoldiersCsv -> {
+                        Toast.makeText(applicationContext, "add csv", Toast.LENGTH_SHORT).show()
+                        true
+                    }
                     else -> {true}
                 }
                 }
@@ -391,6 +397,9 @@ class MainActivity : AppCompatActivity()
         return ids
     }
 
+    override fun soldierAttendantsChange(oldSoldier: Soldier,newSoldier: Soldier) {
+        soldiersViewModel.saveSoldier(oldSoldier,newSoldier)
+    }
 
 
 }

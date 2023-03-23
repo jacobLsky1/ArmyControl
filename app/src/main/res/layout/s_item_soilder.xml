@@ -28,7 +28,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/soldierStationMapTV"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_solider_24" />
+                 />
 
             <TextView
                 android:id="@+id/soldierNameTV"
@@ -37,7 +37,7 @@
                 android:layout_marginStart="10dp"
                 android:text="TextView"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 app:layout_constraintBottom_toTopOf="@+id/IdNumberTV"
                 app:layout_constraintStart_toEndOf="@+id/soldierIcon"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +50,7 @@
                 android:layout_marginTop="5dp"
                 android:text="TextView"
                 android:textColor="#FFFFFF"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 app:layout_constraintBottom_toTopOf="@+id/phoneNumberTV"
                 app:layout_constraintStart_toEndOf="@+id/soldierIcon"
                 app:layout_constraintTop_toBottomOf="@+id/soldierNameTV" />
@@ -82,11 +82,12 @@
             <TextView
                 android:id="@+id/amountOfActivitiesPassedTV"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_height="0dp"
+                android:layout_margin="10dp"
                 android:gravity="center"
                 android:text="TextView"
                 android:textSize="18dp"
+                android:padding="10dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/checkedImageView"
@@ -102,6 +103,17 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/soldierIcon"
                 app:layout_constraintStart_toStartOf="@+id/soldierIcon" />
+
+            <Button
+                android:id="@+id/hasArrivedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="לא נמצא"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

@@ -1,10 +1,12 @@
 package com.jacoblip.andriod.armycontrol.views.soldiers
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -37,7 +39,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
     lateinit var armyJobSpinner: Spinner
     lateinit var positionSpinner: Spinner
     lateinit var isCommanderSwitch: Switch
-    lateinit var hasSoldierArrivedSwitch: Switch
+
     lateinit var soldierHasArrivedTV:TextView
     lateinit var whyNotArrivingET:EditText
     lateinit var usageTV :TextView
@@ -73,6 +75,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         return view
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpViews()
@@ -114,8 +117,6 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
             armyJobSpinner = findViewById(R.id.editSoldierSpinnerJob)
             positionSpinner = findViewById(R.id.editSoldierSpinner2)
             isCommanderSwitch = findViewById(R.id.SoldierIsCommanderSwitch)
-            hasSoldierArrivedSwitch = findViewById(R.id.hasArrivedSwitch)
-            soldierHasArrivedTV = findViewById(R.id.soldierHasArrivedTV)
             whyNotArrivingET = findViewById(R.id.editTextWhyNotArriving)
             addEntryPermSwitch = findViewById(R.id.addPermSwitch)
             entryPermCode = findViewById(R.id.editSoldierPermissionET)
@@ -151,15 +152,6 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         usageTV.text = "תפקידים:${soldier.pakal}"
         isCommanderSwitch.isChecked = soldier.isCommander
         whyNotArrivingET.setText(soldier.whyNotArriving, TextView.BufferType.EDITABLE);
-        hasSoldierArrivedSwitch.isChecked = soldier.hasArrived
-        soldierHasArrivedTV.text = if(hasSoldierArrivedSwitch.isChecked)"כן" else "לא"
-        hasSoldierArrivedSwitch.setOnCheckedChangeListener{ b,isChecked->
-            if(isChecked){
-                soldierHasArrivedTV.text = "כן"
-            }else{
-                soldierHasArrivedTV.text = "לא"
-            }
-        }
 
         if(Util.userCommandPath=="1"){
             addEntryPermSwitch.isVisible = true
@@ -211,6 +203,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         usageTV.text = "תפקידים:${usages}"
     }
 
+   @RequiresApi(Build.VERSION_CODES.O)
    private fun setClickEvents(){
         saveChangesButton.setOnClickListener {
             val isValid = checkIfValid()
@@ -260,7 +253,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         val posMap = positionSpinner.selectedItem.toString()
         val armyJob = Util.getArmyJobPosition(jobMap)
         val soldierPosition = Util.getSoldierArmyPosition(posMap)
-        val hasArrived = hasSoldierArrivedSwitch.isChecked
+        val hasArrived = soldier.hasArrived
         val whyNotArv = whyNotArrivingET.text.toString()
         val isLieutenant = if (isCommander) {
             armyJob[0] == '-'

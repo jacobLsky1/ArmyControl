@@ -55,6 +55,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     interface ButtonCallbacks {
         fun onButtonSelectedSelected(numberOfFragment: Int, soldierCallbacks: SoldierCallbacks, soldierRVCallbacks: SoldierSelectedFromRV)
     }
+
     interface SoldierCallbacks {
         fun onSoldierSelectedSelected(
             soldier: Soldier,
@@ -70,6 +71,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     private var soldierSelectedCallbacks: SoldierSelectedFromRV? = null
     private var soldierCallbacks: SoldierCallbacks? = null
     private var buttonCallbacks: ButtonCallbacks? = null
+
 
 
 

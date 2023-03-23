@@ -306,10 +306,16 @@ import java.util.*
                 }
                 3 -> {
                     for(soldier in userSoldiers) {
-                        if(!soldier.equals(overSoldier)) {
+                        if(!soldier.equals(overSoldier)&&!soldier.isCommander) {
                             var map = commandPathToArray(soldier.positionMap)
-                            if (map.size == 3 && map[map.lastIndex] == position[position.lastIndex])
-                                directSoldiers.add(soldier)
+                            if (map.size == 3) {
+                                var char1 = soldier.positionMap[4]
+                                var char2 = soldier.positionMap[2]
+                                if (char1 == overSoldier.positionMap[4] && char2 == overSoldier.positionMap[2]) {
+                                    directSoldiers.add(soldier)
+                                    continue
+                                }
+                            }
                         }
                     }
                 }

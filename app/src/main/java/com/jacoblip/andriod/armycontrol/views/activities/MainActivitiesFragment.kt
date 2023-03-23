@@ -319,10 +319,10 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
                 LocalDate.now().month,
                 LocalDate.now().dayOfMonth
             )
-            var startDate = LocalDate.of(start.year, start.month, start.dayOfMonth)
-            var endDate = LocalDate.of(end.year, end.month, end.dayOfMonth)
-            startDate = startDate.plusMonths(1)
-            endDate = endDate.plusMonths(1)
+            var startDate = LocalDate.of(start.year, start.month+1, start.dayOfMonth)
+            var endDate = LocalDate.of(end.year, end.month+1, end.dayOfMonth)
+//            startDate = startDate.plusMonths(1)
+//            endDate = endDate.plusMonths(1)
             if(startDate.isBefore(nowDate)){
                 Toast.makeText(requireContext(), "אין אפשרות לבחור תאריך שעבר", Toast.LENGTH_LONG).show()
                 return@RangeDaysPickCallback

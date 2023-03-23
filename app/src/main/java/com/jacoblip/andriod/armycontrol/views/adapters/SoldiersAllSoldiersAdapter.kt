@@ -5,15 +5,21 @@ import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.ddd.androidutils.DoubleClick
+import com.ddd.androidutils.DoubleClickListener
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
 import com.jacoblip.andriod.armycontrol.views.soldiers.MainSoldiersFragment
+import com.jacoblip.andriod.armycontrol.views.soldiers.RVSoldiersFragment
 
-class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks?, var soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV?):RecyclerView.Adapter<SoldierItemViewHolder>() {
+class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks?, var soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV?,var soldierAtedCallback:RVSoldiersFragment.SoldierArrivingCallbacks?):RecyclerView.Adapter<SoldierItemViewHolder>() {
 
     var listOfSoldiers:MutableList<Soldier> = mutableListOf()
 
@@ -34,8 +40,11 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
             var checkedImageView = findViewById<ImageView>(R.id.checkedImageView)
             var isHereTV = findViewById<TextView>(R.id.amountOfActivitiesPassedTV)
             var stationMapTV = findViewById<TextView>(R.id.soldierStationMapTV)
+            var hasSoldierArrivedButton = findViewById<Button>(R.id.hasArrivedButton)
+            var icon = findViewById<ImageView>(R.id.soldierIcon)
             stationMapTV.visibility = View.VISIBLE
-
+            hasSoldierArrivedButton.isVisible = soldierAtedCallback!=null
+            isHereTV.visibility = View.INVISIBLE
             nameTV.text = soldier.name
             idNumberTV.text = soldier.idNumber
             phoneTV.text = soldier.phoneNumber
@@ -43,14 +52,20 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
             phoneTV.linksClickable = true;
             stationMapTV.text = Util.getPositionByCode(soldier.positionMap)
 
-            if(soldier.hasArrived){
-                isHereTV.visibility = View.VISIBLE
-                isHereTV.text = "נוכח"
-                isHereTV.setTextColor(Color.GREEN)
+            if(soldier.isCommander){
+                icon.setBackgroundResource(R.drawable.commander_pic);
             }else{
-                isHereTV.visibility = View.VISIBLE
-                isHereTV.text = "לא נוכח"
-                isHereTV.setTextColor(Color.RED)
+                icon.setBackgroundResource(R.drawable.soilder_pic);
+            }
+
+            hasSoldierArrivedButton.text = if(soldier.hasArrived)"נמצא" else "לא נמצא"
+            hasSoldierArrivedButton.setTextColor(if(soldier.hasArrived)Color.GREEN else Color.RED)
+            hasSoldierArrivedButton.setOnClickListener {
+                var newSodiler = soldier
+                newSodiler.hasArrived = !soldier.hasArrived
+                hasSoldierArrivedButton.text = if(newSodiler.hasArrived)"נמצא" else "לא נמצא"
+                hasSoldierArrivedButton.setTextColor(if(newSodiler.hasArrived)Color.GREEN else Color.RED)
+                soldierAtedCallback!!.soldierAttendantsChange(soldier,newSodiler)
             }
 
             if(callbacks!=null&&soldierSelectedCallbacks!=null) {
@@ -90,6 +105,5 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
         }
         return 0
     }
-
 
 }

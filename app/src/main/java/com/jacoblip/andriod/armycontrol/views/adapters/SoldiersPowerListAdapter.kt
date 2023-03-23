@@ -30,6 +30,12 @@ class SoldiersPowerListAdapter(var soldiers: List<Soldier>, var callbacks: MainS
             var positionMap = findViewById<TextView>(R.id.amountOfActivitiesPassedTV)
             var imageView = findViewById<ImageView>(R.id.soldierIcon)
 
+            if(soldier.isCommander){
+                imageView.setBackgroundResource(R.drawable.commander_pic);
+            }else{
+                imageView.setBackgroundResource(R.drawable.soilder_pic);
+            }
+
             imageView.visibility = View.GONE
             nameTV.text = soldier.name
             idNumberTV.text = "עיסוק אזרחי : ${soldier.civilianJob}"

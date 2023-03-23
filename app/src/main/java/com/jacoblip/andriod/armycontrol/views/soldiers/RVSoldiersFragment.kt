@@ -1,10 +1,13 @@
 package com.jacoblip.andriod.armycontrol.views.soldiers
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
+import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.ActivitiesViewModel
 import com.jacoblip.andriod.armycontrol.data.sevices.SoldiersViewModel
 import com.jacoblip.andriod.armycontrol.views.adapters.SoldiersAllSoldiersAdapter
@@ -29,10 +33,23 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
     lateinit var activitiesViewModel: ActivitiesViewModel
     lateinit var noSoldiersFoundTV:TextView
 
-    /*
+    interface SoldierArrivingCallbacks{
+        fun soldierAttendantsChange( oldSoldier: Soldier,newSoldier: Soldier)
+    }
 
-     */
+    private var soldierAttendants: SoldierArrivingCallbacks? = null
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        soldierAttendants = context as SoldierArrivingCallbacks?
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        soldierAttendants = null
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -49,6 +66,7 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
         return view
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         all_soldiers_RV.layoutManager = LinearLayoutManager(requireContext())
@@ -56,13 +74,15 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
         setUpObservers()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun setUpObservers() {
         soldiersViewModel.listOfPersonalSoldiers.observe(viewLifecycleOwner, Observer {
             if (it != null && it.size!=0) {
                 noSoldiersFoundTV.isVisible = false
                 when (numberSelected) {
                     1 -> {
-                        all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(it, callbacks, callbacksRV)
+
+                        all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(it, callbacks, callbacksRV,soldierAttendants!!)
                     }
                     2 -> {
                         all_soldiers_RV.adapter = SoldiersCommandersAdapter(soldiersViewModel.listOfUserCommanders, callbacks, callbacksRV)
@@ -92,10 +112,11 @@ class RVSoldiersFragment(var callbacks: MainSoldiersFragment.SoldierCallbacks, v
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onBackPressed(){
         when (numberSelected) {
             1 -> {
-                all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(soldiersViewModel.listOfPersonalSoldiers.value!!, callbacks, callbacksRV)
+                all_soldiers_RV.adapter = SoldiersAllSoldiersAdapter(soldiersViewModel.listOfPersonalSoldiers.value!!, callbacks, callbacksRV,soldierAttendants!!)
             }
             2 -> {
                 all_soldiers_RV.adapter = SoldiersCommandersAdapter(soldiersViewModel.listOfUserCommanders, callbacks, callbacksRV)

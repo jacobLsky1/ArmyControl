@@ -66,6 +66,7 @@ class SoldiersOperationalListAdapter(var soldiers:List<Soldier>, var callbacks: 
         }
         holder.itemView.apply {
 
+
             var nameTV = findViewById<TextView>(R.id.soldierNameTV)
             var idNumberTV = findViewById<TextView>(R.id.IdNumberTV)
             var phoneTV = findViewById<TextView>(R.id.phoneNumberTV)
@@ -78,12 +79,23 @@ class SoldiersOperationalListAdapter(var soldiers:List<Soldier>, var callbacks: 
             activitiesTV.visibility = View.VISIBLE
             activitiesTV.text = " פעילויות שהושלמו:\n${amoutOfActivitiesSoldierCompleted}/${amountOfActivitiesCompleted}"
 
+            if(soldier.isCommander){
+                icon.setBackgroundResource(R.drawable.commander_pic);
+            }else{
+                icon.setBackgroundResource(R.drawable.soilder_pic);
+            }
 
             when(degree){
-                0->icon.setColorFilter(ContextCompat.getColor(context, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN)
-                1->icon.setColorFilter(ContextCompat.getColor(context, R.color.yellow), android.graphics.PorterDuff.Mode.SRC_IN)
-                2->icon.setColorFilter(ContextCompat.getColor(context, R.color.orange), android.graphics.PorterDuff.Mode.SRC_IN)
-                3->icon.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN)
+                0->activitiesTV.setBackgroundColor(resources.getColor(R.color.green))
+                1->activitiesTV.setBackgroundColor(resources.getColor(R.color.yellow))
+                2->activitiesTV.setBackgroundColor(resources.getColor(R.color.orange))
+                3->activitiesTV.setBackgroundColor(resources.getColor(R.color.red))
+
+
+//                0->icon.setColorFilter(ContextCompat.getColor(context, R.color.green), android.graphics.PorterDuff.Mode.SRC_IN)
+//                1->icon.setColorFilter(ContextCompat.getColor(context, R.color.yellow), android.graphics.PorterDuff.Mode.SRC_IN)
+//                2->icon.setColorFilter(ContextCompat.getColor(context, R.color.orange), android.graphics.PorterDuff.Mode.SRC_IN)
+//                3->icon.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN)
             }
             setOnClickListener {
                 callbacks.onSoldierSelectedSelected(soldier, callbacks, callBacks2)
