@@ -19,6 +19,14 @@ data class  Soldier(
         var isCommander:Boolean = false,
         var isLieutenant:Boolean = false,
         var pakal:List<String> = listOf(),
-        var Activates:List<ArmyActivity> = listOf()
+        var Activates:List<ArmyActivity> = listOf(),
+        var hasGun:Boolean = false,
+        var hasBi:Boolean = false,
+        var hasNV:Boolean = false,
+        var hasRadio:Boolean = false,
+        var numGun:String = "",
+        var numBi:String = "",
+        var numNV:String = "",
+        var numRadio:String = ""
 ) {
 }

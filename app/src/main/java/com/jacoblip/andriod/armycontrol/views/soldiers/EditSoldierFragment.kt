@@ -60,6 +60,16 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
     lateinit var checkBox11:CheckBox
     lateinit var checkBox12:CheckBox
 
+    lateinit var gunSwitch:Switch
+    lateinit var biSwitch:Switch
+    lateinit var nvSwitch:Switch
+    lateinit var radioSwitch:Switch
+
+    lateinit var gunEditText: EditText
+    lateinit var biEditText: EditText
+    lateinit var nvEditText: EditText
+    lateinit var radioEditText: EditText
+
     lateinit var listOfCheckBoxs:List<CheckBox>
 
     var listOfDatesOfService :List<Date> = soldier.listOfDatesInService
@@ -136,6 +146,16 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
             checkBox12 = findViewById(R.id.checkBox12)
             listOfCheckBoxs = listOf<CheckBox>(checkBox1,checkBox2,checkBox3,checkBox4,checkBox5,checkBox6,checkBox7,checkBox8,checkBox9,checkBox10,checkBox11,checkBox12)
 
+            gunSwitch = findViewById(R.id.hasGunSwitch)
+            biSwitch = findViewById(R.id.hasBiSwitch)
+            nvSwitch = findViewById(R.id.hasNVSwitch)
+            radioSwitch = findViewById(R.id.hasRadioSwitch)
+            gunEditText = findViewById(R.id.editTextTextGunNumber)
+            biEditText = findViewById(R.id.editTextTextBiNumber)
+            nvEditText = findViewById(R.id.editTextTextNVNumber)
+            radioEditText = findViewById(R.id.editTextTextRadioNumber)
+
+
             listOfUsages = soldier.pakal.toMutableList()
         }
 
@@ -173,6 +193,42 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
 
         setUpCheckBoxs()
 
+        gunSwitch.setOnCheckedChangeListener{  b, isChecked ->
+            gunEditText.isVisible = isChecked
+        }
+        biSwitch.setOnCheckedChangeListener{  b, isChecked ->
+            biEditText.isVisible = isChecked
+        }
+        nvSwitch.setOnCheckedChangeListener{  b, isChecked ->
+            nvEditText.isVisible = isChecked
+        }
+        radioSwitch.setOnCheckedChangeListener{  b, isChecked ->
+            radioEditText.isVisible = isChecked
+        }
+        if(soldier.hasGun){
+            gunSwitch.isChecked = true
+            gunEditText.setText(soldier.numGun)
+        }else{
+            gunSwitch.isChecked = false
+        }
+        if(soldier.hasBi){
+            biSwitch.isChecked = true
+            biEditText.setText(soldier.numBi)
+        }else{
+            biSwitch.isChecked = false
+        }
+        if(soldier.hasNV){
+            nvSwitch.isChecked = true
+            nvEditText.setText(soldier.numNV)
+        }else{
+            nvSwitch.isChecked = false
+        }
+        if(soldier.hasRadio){
+            radioSwitch.isChecked = true
+            radioEditText.setText(soldier.numRadio)
+        }else{
+            radioSwitch.isChecked = false
+        }
 
     }
 
@@ -237,6 +293,22 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
             soldierPhoneNumberET.error = "שדה חובה"
             return false
         }
+        if(gunSwitch.isChecked && gunEditText.text.isEmpty()){
+            gunEditText.error = "שדה חובה אם חתום נשק"
+            return false
+        }
+        if(biSwitch.isChecked && biEditText.text.isEmpty()){
+            biEditText.error = "שדה חובה אם חתום משקפת"
+            return false
+        }
+        if(nvSwitch.isChecked && nvEditText.text.isEmpty()){
+            nvEditText.error = "שדה חובה אם חתום אמרל"
+            return false
+        }
+        if(radioSwitch.isChecked && radioEditText.text.isEmpty()){
+            radioEditText.error ="שדה חובה אם חתום קשר"
+            return false
+        }
         return true
     }
 
@@ -255,6 +327,14 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         val soldierPosition = Util.getSoldierArmyPosition(posMap)
         val hasArrived = soldier.hasArrived
         val whyNotArv = whyNotArrivingET.text.toString()
+        val hasGun = gunSwitch.isChecked
+        val hasBi = biSwitch.isChecked
+        val hasNV = nvSwitch.isChecked
+        val hasRadio = radioSwitch.isChecked
+       val gunNum = if(gunSwitch.isChecked)gunEditText.text.toString() else ""
+       val biNum = if(biSwitch.isChecked)biEditText.text.toString() else ""
+       val nvNum = if(nvSwitch.isChecked)nvEditText.text.toString() else ""
+       val radioNum = if(radioSwitch.isChecked)radioEditText.text.toString() else ""
         val isLieutenant = if (isCommander) {
             armyJob[0] == '-'
         } else false
@@ -262,7 +342,7 @@ class EditSoldierFragment(val soldier: Soldier):Fragment() {
         if (job.isEmpty()) job = "לא עודכן"
 
 
-        return Soldier(name, idNum, age, medData, hasArrived, whyNotArv, listOfDatesOfService, phone, job, armyJob, soldierPosition,entrycode, isCommander, isLieutenant, listOfUsages.toList(), listOfSoldierActivities)
+        return Soldier(name, idNum, age, medData, hasArrived, whyNotArv, listOfDatesOfService, phone, job, armyJob, soldierPosition,entrycode, isCommander, isLieutenant, listOfUsages.toList(), listOfSoldierActivities,hasGun,hasBi,hasNV,hasRadio,gunNum,biNum,nvNum,radioNum)
     }
 
 

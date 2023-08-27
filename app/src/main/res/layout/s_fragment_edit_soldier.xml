@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="100dp"
@@ -185,13 +186,13 @@
             android:id="@+id/soldierUsageTV"
             android:layout_width="0dp"
             android:layout_height="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:gravity="center"
             android:text='פק"לים:'
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextArmyJobAndPosition2" />
+            app:layout_constraintTop_toBottomOf="@+id/hasRadioSwitch" />
 
         <CheckBox
             android:id="@+id/checkBox3"
@@ -315,15 +316,14 @@
             app:layout_constraintTop_toTopOf="@+id/checkBox11" />
 
 
-
         <Switch
             android:id="@+id/addPermSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:text="בעל הרשאת כניסה לאפליקציה?"
             android:thumbTint="@color/orange"
             android:visibility="gone"
-            android:text="בעל הרשאת כניסה לאפליקציה?"
             app:layout_constraintEnd_toEndOf="@+id/SoldierIsCommanderSwitch"
             app:layout_constraintStart_toStartOf="@+id/SoldierIsCommanderSwitch"
             app:layout_constraintTop_toBottomOf="@+id/SoldierIsCommanderSwitch" />
@@ -351,6 +351,110 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/addPermSwitch" />
+
+        <Switch
+            android:id="@+id/hasGunSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="חתום נשק"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/editTextTextGunNumber"
+            app:layout_constraintTop_toBottomOf="@+id/editSoldierSpinner2" />
+
+        <EditText
+            android:id="@+id/editTextTextGunNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="מספר נשק"
+            android:inputType="textPersonName"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/hasGunSwitch"
+            app:layout_constraintEnd_toStartOf="@+id/hasGunSwitch"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/hasGunSwitch" />
+
+        <Switch
+            android:id="@+id/hasBiSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="חתום משקפת"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/editTextTextBiNumber"
+            app:layout_constraintTop_toBottomOf="@+id/hasGunSwitch" />
+
+        <EditText
+            android:id="@+id/editTextTextBiNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="מספר משקפת"
+            android:inputType="textPersonName"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/hasBiSwitch"
+            app:layout_constraintEnd_toStartOf="@+id/hasBiSwitch"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/hasBiSwitch" />
+
+        <Switch
+            android:id="@+id/hasNVSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="חתום אמרל"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/editTextTextNVNumber"
+            app:layout_constraintTop_toBottomOf="@+id/hasBiSwitch" />
+
+        <EditText
+            android:id="@+id/editTextTextNVNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="מספר אמרל"
+            android:inputType="textPersonName"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/hasNVSwitch"
+            app:layout_constraintEnd_toStartOf="@+id/hasNVSwitch"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/hasNVSwitch" />
+
+        <Switch
+            android:id="@+id/hasRadioSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="חתום קשר"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/editTextTextRadioNumber"
+            app:layout_constraintTop_toBottomOf="@+id/hasNVSwitch" />
+
+        <EditText
+            android:id="@+id/editTextTextRadioNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="מספר קשר"
+            android:inputType="textPersonName"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/hasRadioSwitch"
+            app:layout_constraintEnd_toStartOf="@+id/hasRadioSwitch"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/hasRadioSwitch" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

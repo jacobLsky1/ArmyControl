@@ -36,7 +36,7 @@ import java.util.*
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPath:String):Fragment() {
+class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPath:String,val listOfSoldiers:kotlin.collections.List<Soldier>?):Fragment() {
 
     lateinit var activitesViewModel: ActivitiesViewModel
     lateinit var soldiersViewModel:SoldiersViewModel
@@ -78,6 +78,11 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPa
         val view = inflater.inflate(R.layout.a_fragment_add_new_activity, container, false)
         activitesViewModel = ViewModelProvider(requireActivity()).get(ActivitiesViewModel::class.java)
         soldiersViewModel = ViewModelProvider(requireActivity()).get(SoldiersViewModel::class.java)
+        AddingSoldierHelper.soldiersAlreadyExistingNotFromGroup = mutableListOf()
+        soldiersViewModel.currentFragment = this
+        if(listOfSoldiers!=null){
+            soldiersForActivity.addAll(listOfSoldiers)
+        }
 
         if(armyActivity!=null){
             dateOfActivity = armyActivity!!.date
@@ -92,6 +97,7 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPa
 
     private fun setUpViews(view: View){
         view.apply {
+
             activityTypeSpinner = findViewById(R.id.typeOfActivitySpinner)
             activityNameET = findViewById(R.id.activityNameET)
             dateButton = findViewById(R.id.activityDateButton)
@@ -107,7 +113,7 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPa
             activityCompletedSwitch = findViewById(R.id.activityCompletedSwitch)
             activityCompletedTV = findViewById(R.id.activityCompletedTV)
 
-            if(Util.userCommandPath.length!=1){
+            if(Util.userCommandPath.length>3){
                 addSoldiersButton.isEnabled = false
             }
 
@@ -128,12 +134,32 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPa
     }
 
     private fun setUpObservers(){
+
         Util.soldiersToAddToActivityLD.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 var allSoldiers = soldiersViewModel.listOfAllSoldiers
-                for(soldier in allSoldiers!!){
-                    if(it.contains(soldier!!.idNumber))
-                        soldiersForActivity.add(soldier)
+                if(!allSoldiers.isNullOrEmpty()) {
+                    for (soldier in allSoldiers!!) {
+                        if (it.contains(soldier!!.idNumber)) {
+                            if (Util.userCommandPath.length != 1) {
+                                if (soldier.positionMap.length > 1) {
+                                    if (soldier.positionMap[2] == Util.userCommandPath[2]) {
+                                        soldiersForActivity.add(soldier)
+                                    } else {
+                                        AddingSoldierHelper.soldiersAlreadyExistingNotFromGroup.add(
+                                            soldier.idNumber
+                                        )
+                                    }
+                                } else {
+                                    AddingSoldierHelper.soldiersAlreadyExistingNotFromGroup.add(
+                                        soldier.idNumber
+                                    )
+                                }
+                            } else {
+                                soldiersForActivity.add(soldier)
+                            }
+                        }
+                    }
                 }
                 participantsRV.adapter = AddSoldierToActivityAdapter(soldiersForActivity)
             }
@@ -189,22 +215,25 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPa
             if(type.isEmpty()||name.isEmpty()||date.isEmpty()||startTime.isEmpty()||endTime.isEmpty()){
                 alertUserError(name, date, startTime, endTime)
             }else {
-                var soldiers =  Util.soldiersToAddToActivityLD.value?: listOf<String>()
-                val newArmyActivity = ArmyActivity(type, name, date, startTime, endTime, location, soldiers, isCompleted)
-
+                var soldiers =  Util.soldiersToAddToActivityLD.value?: listOf()
                 var list:MutableList<String> = mutableListOf()
                 val allSoldiers = soldiersViewModel.listOfAllSoldiers
-                for(soldier in allSoldiers!!){
-                    if(soldiers.contains(soldier!!.idNumber)){
-                        list.add(soldier!!.idNumber)
+                if(!allSoldiers.isNullOrEmpty()) {
+                    for (soldier in allSoldiers!!) {
+                        if (soldiers.contains(soldier!!.idNumber)) {
+                            list.add(soldier!!.idNumber)
+                        }
                     }
                 }
-
+                list.addAll(AddingSoldierHelper.soldiersAlreadyExistingNotFromGroup)
+                val newArmyActivity = ArmyActivity(type, name, date, startTime, endTime, location, list, isCompleted)
                     activitesViewModel.saveActivity(armyActivity, newArmyActivity,list)
                     soldiersViewModel.addActivityToSoldiers(armyActivity,newArmyActivity)
 
+
+
                 requireActivity().supportFragmentManager.popBackStack()
-             //   activityCallbacks?.onActivityFragmentBackPressed()
+                //soldiersViewModel.wasInActivityEdit.postValue(true)
                 Util.soldiersToAddToActivityLD.postValue(null)
             }
         }
@@ -436,8 +465,8 @@ class AddOrEditNewActivityFragment(var armyActivity: ArmyActivity?,var commandPa
 
 
     companion object{
-        fun newInstance(armyActivity: ArmyActivity?,commandPath:String):AddOrEditNewActivityFragment{
-            return AddOrEditNewActivityFragment(armyActivity,commandPath)
+        fun newInstance(armyActivity: ArmyActivity?,commandPath:String,listOfSoldiers:kotlin.collections.List<Soldier>?):AddOrEditNewActivityFragment{
+            return AddOrEditNewActivityFragment(armyActivity,commandPath,listOfSoldiers)
         }
     }
 }

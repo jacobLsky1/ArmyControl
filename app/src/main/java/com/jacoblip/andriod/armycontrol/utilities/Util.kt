@@ -187,12 +187,22 @@ class Util {
             }
         }
 
+        var excelArmyJobs = listOf<String>("מפ","סמפ","רספ","ממ","סמל","מכ","לוחם")
+        var excelArmyPositions = listOf<String>("פלוגה א","פלוגה ב","פלוגה ג","פלוגה ד","מסייעת","פיקוד הפלוגה","מפלג","מחלקה 1","מחלקה 2","מחלקה 3","כיתה א","כיתה ב","כיתה ג")
+
         var soldiersToAddToActivityLD:MutableLiveData<List<String>> = MutableLiveData(listOf())
+        var soldiersExistingInActivityThatAreNotFromGroup:MutableLiveData<List<String>> = MutableLiveData(listOf())
         var currentDate:MutableLiveData<ArmyDay> = MutableLiveData()
 
         var inActivitiesFragment = false
 
         var groupRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("X")
+        var groupName  = ""
+        var groupCode = ""
+
+
+        var listOfOldSoldiersUpdatedByIsPresent:MutableList<Soldier> = mutableListOf()
+        var listOfNewSoldiersUpdatedByIsPresent:MutableList<Soldier> = mutableListOf()
     }
 
 

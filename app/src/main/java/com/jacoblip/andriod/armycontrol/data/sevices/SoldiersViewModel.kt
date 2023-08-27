@@ -39,6 +39,9 @@ import java.util.*
     private var _listOfPersonalSoldiersForSoldier = MutableLiveData<List<Soldier>>()
     var listOfPersonalSoldiersForSoldier:LiveData<List<Soldier>> = _listOfPersonalSoldiersForSoldier
 
+     private var _gotSoldiers = MutableLiveData<Boolean>(false)
+     var gotSoldiers:LiveData<Boolean> = _gotSoldiers
+
     private var _userGroup = MutableLiveData<Group>()
     var userGroup:LiveData<Group> = _userGroup
 
@@ -62,6 +65,7 @@ import java.util.*
                 val t: GenericTypeIndicator<List<Soldier?>?> = object : GenericTypeIndicator<List<Soldier?>?>() {}
                 listOfAllSoldiers = dataSnapshot.getValue(t)
                 updateLists()
+                _gotSoldiers.postValue(true)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -238,9 +242,20 @@ import java.util.*
                      }
                     else->{
                          if(soldierPosition.size>=position.size&& position[commanderLastIndex]==soldierPosition[commanderLastIndex]) {
-                             listOfSoldiersForGroup.add(soldier)
-                             if(soldier.hasArrived)
-                                 amountOfSoldiersPresent++
+                             if(position.size==3){
+                                 if(position[commanderLastIndex-1]==soldierPosition[commanderLastIndex-1]){
+                                     listOfSoldiersForGroup.add(soldier)
+                                     if(soldier.hasArrived)
+                                         amountOfSoldiersPresent++
+                                 }
+                             }else{
+                                 if(position.size==2 || position.size==1){
+                                     listOfSoldiersForGroup.add(soldier)
+                                     if(soldier.hasArrived)
+                                         amountOfSoldiersPresent++
+                                 }
+                             }
+
                          }
                      }
 
@@ -337,6 +352,17 @@ import java.util.*
             increaceNumber(position)
         }
     }
+
+     fun addListOfSoldiers(soldiers:List<Soldier>){
+
+         soldiersReference.setValue(soldiers).addOnSuccessListener {
+             Log.i("Repository", "added soldiers")
+             for(addedSoldier in soldiers) {
+                 var position = commandPathToArray(addedSoldier.positionMap)
+                 increaceNumber(position)
+             }
+         }
+     }
 
      fun increaceNumber(position: List<String>){
          when(position.size){
@@ -442,6 +468,18 @@ import java.util.*
          _nowSoldier.postValue(newSoldier)
      }
 
+     fun saveSoldiers(newSoldiers:List<Soldier>,oldSoldiers:List<Soldier>){
+         var allSoldiers = listOfAllSoldiers?.toMutableList()
+         for(i in oldSoldiers.indices){
+             val orgSoldier = allSoldiers!!.filter { it!!.idNumber == oldSoldiers[i].idNumber }
+             val index = allSoldiers.indexOf(orgSoldier[0])
+             allSoldiers[index] = newSoldiers[i]
+         }
+         soldiersReference.setValue(allSoldiers).addOnSuccessListener {
+             Log.i("viewModel","updated soldier")
+         }
+     }
+
      fun popStack(){
          soldierStack.pop()
          if(soldierStack.isNotEmpty())
@@ -471,23 +509,31 @@ import java.util.*
 
      fun addActivityToSoldiers(oldArmyActivity: ArmyActivity?,newArmyActivity: ArmyActivity) {
          var allSoldiers = listOfAllSoldiers
-         for(soldier in allSoldiers!!){
-             if(newArmyActivity.attendees.contains(soldier!!.idNumber)){
-                 if(oldArmyActivity==null) {
-                     val list = soldier.Activates.toMutableList()
-                     list.add(newArmyActivity)
-                     list.sortBy { it.date }
-                     soldier.Activates = list
-                 }else{
-                     val inx = soldier.Activates.indexOf(oldArmyActivity)
-                     val list = soldier.Activates.toMutableList()
-                     list[inx] = newArmyActivity
-                     list.sortBy { it.date }
-                     soldier.Activates = list
+         if(!allSoldiers.isNullOrEmpty()) {
+             for (soldier in allSoldiers!!) {
+                 if (newArmyActivity.attendees.contains(soldier!!.idNumber)) {
+                     if (oldArmyActivity == null) {
+                         val list = soldier.Activates.toMutableList()
+                         list.add(newArmyActivity)
+                         list.sortBy { it.date }
+                         soldier.Activates = list
+                     } else {
+                         val inx = soldier.Activates.indexOf(oldArmyActivity)
+                         val list = soldier.Activates.toMutableList()
+                         list[inx] = newArmyActivity
+                         list.sortBy { it.date }
+                         soldier.Activates = list
+                     }
+                 } else {
+                     var activities = soldier.Activates.toMutableList()
+                     if (activities.contains(oldArmyActivity)) {
+                         activities.remove(oldArmyActivity)
+                         soldier.Activates = activities
+                     }
                  }
              }
+             soldiersReference.setValue(allSoldiers)
          }
-         soldiersReference.setValue(allSoldiers)
      }
 
      fun removeActivitiesFromSoldiers(activities: List<ArmyActivity>){

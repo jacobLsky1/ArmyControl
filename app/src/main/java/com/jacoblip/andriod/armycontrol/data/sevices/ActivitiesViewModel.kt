@@ -51,24 +51,24 @@ class ActivitiesViewModel(repository: Repository,context: Context):ViewModel() {
     }
 
     fun addArmyDays(days:List<ArmyDay>){
-        var indexsForRmoval = mutableListOf<Int>()
         var armyDays = days.toMutableList()
         for(i in armyDays.indices){
             var newDay = armyDays[i]
+            for(day in armyDays){
+                var list = listOfAllArmyDays!!.filter { it!!.date == day.date }
+                if(list.isEmpty()){
+                    listOfAllArmyDays?.add(day)
+                }
+            }
             for(existingArmyDay in listOfAllArmyDays!!){
                 if(newDay.date==existingArmyDay?.date){
-                     indexsForRmoval.add(i)
+                    listOfAllArmyDays!![listOfAllArmyDays!!.indexOf(existingArmyDay)] = newDay
                 }
             }
         }
-        for(i in indexsForRmoval){
-            armyDays.removeAt(i)
-        }
-        listOfAllArmyDays?.addAll(armyDays)
         listOfAllArmyDays?.sortedBy {
             it!!.date
         }
-
         activityReference.setValue(listOfAllArmyDays?.toList())
     }
 

@@ -1,24 +1,24 @@
 package com.jacoblip.andriod.armycontrol
 
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.SharedPreferences
+import android.content.*
 import android.net.ConnectivityManager
+import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.OpenableColumns
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.navigation.NavigationView
@@ -27,23 +27,29 @@ import com.jacoblip.andriod.armycontrol.data.models.ArmyActivity
 import com.jacoblip.andriod.armycontrol.data.models.ArmyDay
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.data.sevices.*
-import com.jacoblip.andriod.armycontrol.utilities.AddingSoldierHelper
-import com.jacoblip.andriod.armycontrol.utilities.Util
-import com.jacoblip.andriod.armycontrol.utilities.WifiReceiver
+import com.jacoblip.andriod.armycontrol.utilities.*
 import com.jacoblip.andriod.armycontrol.views.*
 import com.jacoblip.andriod.armycontrol.views.activities.AddOrEditNewActivityFragment
 import com.jacoblip.andriod.armycontrol.views.activities.MainActivitiesFragment
 import com.jacoblip.andriod.armycontrol.views.adapters.AddSoldierToDayAdapter
 import com.jacoblip.andriod.armycontrol.views.soldiers.*
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellType
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import java.io.*
 import java.time.LocalDate
 
+
+private const val FILE_REQUEST_CODE = 945381
 @RequiresApi(Build.VERSION_CODES.O)
 class MainActivity : AppCompatActivity()
         , MainSoldiersFragment.ButtonCallbacks, MainSoldiersFragment.SoldierCallbacks,
          MainSoldiersFragment.SoldierSelectedFromRV, SoldierFragment.EditSoldierCallbacks,
         MainActivitiesFragment.OnActivityPressedCallBacks, MainFragment.AddActivityCallBacks,
         MainActivitiesFragment.OnActivitySelectedFromRVCallBacks,MainActivitiesFragment.OnDayLongPressCallBacks,
-        RVSoldiersFragment.SoldierArrivingCallbacks {
+        RVSoldiersFragment.SoldierArrivingCallbacks,MainSoldiersFragment.SoldierSignedItemsCallbacks {
 
     lateinit var toggle: ActionBarDrawerToggle
     lateinit var navView: NavigationView
@@ -54,6 +60,7 @@ class MainActivity : AppCompatActivity()
     lateinit var wifiReceiver:WifiReceiver
     lateinit var fragment: Fragment
     lateinit var removeButton: Button
+    lateinit var addToActivityButton: Button
     lateinit var preferences : SharedPreferences
     var listOfSoldiersSelected = mutableListOf<Soldier>()
     var listOfActivitysSelected = mutableListOf<ArmyActivity>()
@@ -65,13 +72,25 @@ class MainActivity : AppCompatActivity()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.m_activity_main)
         removeButton = findViewById(R.id.deleteSoldierButton)
+        addToActivityButton = findViewById(R.id.addToActivityButton)
         navView = findViewById(R.id.navView)
         drawerLayout = findViewById(R.id.drawerLayout)
         preferences = getSharedPreferences("armyControl", Context.MODE_PRIVATE)
         var intent = intent
+        var firstTime = preferences.getString("firstTime","")
+        if(firstTime==""){
+            preferences.edit().putString("firstTime","false").apply()
+            val intent = Intent(applicationContext, InfoActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            applicationContext.startActivity(intent)
+        }
         commandPath = intent.getStringExtra("commandPath").toString()
         armyControlGroup = preferences.getString("ArmyControlGroup","").toString()
-        Util.groupRef = FirebaseDatabase.getInstance().getReference(armyControlGroup)
+        val code = preferences.getString("valid","")
+        val name = preferences.getString("groupName","")
+        Util.groupName = name!!
+        Util.groupCode = code!!
+        Util.groupRef = FirebaseDatabase.getInstance().getReference("groups").child(code!!).child(armyControlGroup)
         Util.userCommandPath = commandPath
 
         val toolbar: Toolbar = findViewById(R.id.tool_bar)
@@ -109,8 +128,20 @@ class MainActivity : AppCompatActivity()
                 listOfActivitysSelected = mutableListOf()
             }
         }
+        addToActivityButton.setOnClickListener {
+            removeButton.visibility = View.GONE
+            addToActivityButton.visibility = View.GONE
+            fragment = AddOrEditNewActivityFragment.newInstance(null,commandPath,listOfSoldiersSelected.toList())
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.main_fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
         fragment = commandPath?.let { MainFragment.newInstance(it) }!!
         setFragement(fragment)
+        Util.inSelectionMode.postValue(false)
+        listOfSoldiersSelected = mutableListOf()
     }
 
     fun setUpObservers(){
@@ -121,9 +152,13 @@ class MainActivity : AppCompatActivity()
                     removeButton.text = "הסר פעילויות"
                 }else{
                     removeButton.text = "הסר חיילים"
+                    if(Util.userCommandPath=="1") {
+                        addToActivityButton.visibility = View.VISIBLE
+                    }
                 }
             }else{
                 removeButton.visibility = View.GONE
+                addToActivityButton.visibility = View.GONE
             }
         })
 
@@ -167,9 +202,20 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onSoldierSelectedSelected(soldier: Soldier, callbacks1: MainSoldiersFragment.SoldierCallbacks, soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV?) {
+        checkUpdatedSoldiers()
         fragment = SoldierFragment.newInstance(soldier,callbacks1,soldierSelectedCallbacks)
         soldiersViewModel.setSoldier(soldier)
         soldiersViewModel.soldierStack.push(soldier)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.main_fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+
+    override fun onSignedItemsSelected() {
+        fragment = SignedItemsFragment.newInstance()
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.main_fragment_container, fragment)
@@ -198,6 +244,8 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onBackPressed() {
+        checkUpdatedSoldiers()
+
         var fragment = soldiersViewModel.currentFragment
         if(Util.inSelectionMode.value!!){
             Util.inSelectionMode.postValue(false)
@@ -224,6 +272,14 @@ class MainActivity : AppCompatActivity()
         }
     }
 
+    private fun checkUpdatedSoldiers(){
+        if(Util.listOfOldSoldiersUpdatedByIsPresent.isNotEmpty()){
+            soldiersViewModel.saveSoldiers(Util.listOfNewSoldiersUpdatedByIsPresent,Util.listOfOldSoldiersUpdatedByIsPresent)
+        }
+        Util.listOfOldSoldiersUpdatedByIsPresent = mutableListOf()
+        Util.listOfNewSoldiersUpdatedByIsPresent = mutableListOf()
+    }
+
     private fun exitDialog(){
         val inflater = layoutInflater
         val dialogView = inflater.inflate(R.layout.a_alert_for_deleting_activitys, null)
@@ -247,8 +303,29 @@ class MainActivity : AppCompatActivity()
         }
     }
 
+    private fun alertFromUser(){
+        val inflater = layoutInflater
+        val dialogView = inflater.inflate(R.layout.i_alert_for_import_excel, null)
+        val yesButton = dialogView.findViewById(R.id.excelOkButton) as Button
+        val noButton = dialogView.findViewById(R.id.excelCancelButton) as Button
+
+        val alertDialog = AlertDialog.Builder(this@MainActivity)
+        alertDialog.setView(dialogView).setCancelable(false)
+
+        val dialog = alertDialog.create()
+        dialog.show()
+
+        noButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        yesButton.setOnClickListener {
+            dialog.dismiss()
+            getContent.launch("*/*")
+        }
+    }
+
     override fun onActivityPressed(activity:ArmyActivity?) {
-        fragment = AddOrEditNewActivityFragment.newInstance(activity,commandPath)
+        fragment = AddOrEditNewActivityFragment.newInstance(activity,commandPath,null)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.main_fragment_container, fragment)
@@ -270,6 +347,8 @@ class MainActivity : AppCompatActivity()
                 when (it.itemId) {
                     R.id.switchUserButton -> {
                         preferences.edit().putString("ArmyControlLoggedIn", "").apply()
+                        preferences.edit().putString("valid","").apply()
+                        Util.groupCode = ""
                         val intent = Intent(this, LoginActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -280,14 +359,101 @@ class MainActivity : AppCompatActivity()
                         true
                     }
 
+                    R.id.shareApp -> {
+                        val appPackageName = applicationContext.packageName
+                        val toShare = "הורד אפליקציית פיקוד ושליטה \nhttps://play.google.com/store/apps/details?id=$appPackageName"
+                        val shareIntent = Intent(Intent.ACTION_SEND)
+                        shareIntent.type = "text/plain"
+                        shareIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, toShare)
+                        startActivity(Intent.createChooser(shareIntent, "Share using ..."))
+                        true
+                    }
+
+                    R.id.rateApp -> {
+                        val appPackageName = applicationContext.packageName
+                        try {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            applicationContext.startActivity(intent)
+                        } catch (e: ActivityNotFoundException) {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"))
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                            startActivity(intent)
+                        }
+                        true
+                    }
+
+                    R.id.soldierAppInfo -> {
+                        val intent = Intent(applicationContext, AboutActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                        applicationContext.startActivity(intent)
+                        true
+                    }
+
+                    R.id.soldierAppHelper -> {
+                        val intent = Intent(applicationContext, InfoActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        applicationContext.startActivity(intent)
+                        true
+                    }
+
                     R.id.addSoldiersCsv -> {
-                        Toast.makeText(applicationContext, "add csv", Toast.LENGTH_SHORT).show()
+                        if(Util.userCommandPath=="1") {
+                            alertFromUser()
+                        }else{
+                            Toast.makeText(applicationContext, "רק מפקד פלוגה יכול להוסיף חייל", Toast.LENGTH_LONG).show()
+                        }
                         true
                     }
                     else -> {true}
                 }
                 }
     }
+
+    val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            Log.d("wtf",uri.getPath().toString())
+            val fileName = applicationContext.contentResolver.getFileName(uri)
+            val inputStream = applicationContext.contentResolver.openInputStream(uri)
+
+            if(
+                !isExcelFile(fileName)
+            ){
+                Toast.makeText(applicationContext, "נא לבחור קובץ excel", Toast.LENGTH_SHORT).show()
+            }else{
+                if (inputStream != null) {
+                    readFromExcelFile(inputStream)
+                }
+            }
+
+        }
+    }
+
+    fun isExcelFile(filePath: String): Boolean {
+        val extension = filePath.substringAfterLast(".", "")
+        return extension.equals("xls", ignoreCase = true) || extension.equals("xlsx", ignoreCase = true)
+    }
+    private fun readFromExcelFile(inputStream: InputStream) {
+        val soldiersFromExcel = ExcelUtil.getSoldiersFromExcel(inputStream,applicationContext)
+        soldiersViewModel.addListOfSoldiers(soldiersFromExcel)
+    }
+
+
+    fun ContentResolver.getFileName(fileUri: Uri): String {
+
+        var name = ""
+        val returnCursor = this.query(fileUri, null, null, null, null)
+        if (returnCursor != null) {
+            val nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            returnCursor.moveToFirst()
+            name = returnCursor.getString(nameIndex)
+            returnCursor.close()
+        }
+
+        return name
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(toggle.onOptionsItemSelected(item))
@@ -400,6 +566,7 @@ class MainActivity : AppCompatActivity()
     override fun soldierAttendantsChange(oldSoldier: Soldier,newSoldier: Soldier) {
         soldiersViewModel.saveSoldier(oldSoldier,newSoldier)
     }
+
 
 
 }

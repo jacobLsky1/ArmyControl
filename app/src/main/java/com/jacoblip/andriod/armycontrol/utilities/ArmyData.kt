@@ -93,11 +93,6 @@ class ArmyData {
 
         val listOfSoldiers = listOf<Soldier>()
 
-        val code0 = "5930278 8720395 1"
-        val code1 = "8049909 9099408 1"
-        val code2 = "5814513 3154185 1"
-        val code3 = "5913690 0963195 1"
-
-
+        var initcode = "1"
     }
 }

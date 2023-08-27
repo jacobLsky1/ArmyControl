@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -41,6 +42,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     lateinit var allSoldiersButton:Button
     lateinit var operationalListButton:Button
     lateinit var powerListButton:Button
+    lateinit var signedItemsButton:Button
     lateinit var amountOfSoldiersPresentTV:TextView
     lateinit var amountOfCommandersTV:TextView
     lateinit var noArmyDaysYetTV :TextView
@@ -64,6 +66,10 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
         )
     }
 
+    interface SoldierSignedItemsCallbacks{
+        fun onSignedItemsSelected()
+    }
+
     interface SoldierSelectedFromRV {
         fun onSoldierSelectedFromRV(soldier: Soldier,addSoldier:Boolean)
     }
@@ -71,6 +77,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
     private var soldierSelectedCallbacks: SoldierSelectedFromRV? = null
     private var soldierCallbacks: SoldierCallbacks? = null
     private var buttonCallbacks: ButtonCallbacks? = null
+    private var signedItemsCallbacks: SoldierSignedItemsCallbacks? = null
 
 
 
@@ -80,7 +87,8 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
         super.onAttach(context)
         buttonCallbacks = context as ButtonCallbacks?
         soldierCallbacks = context as SoldierCallbacks?
-        soldierSelectedCallbacks = context as SoldierSelectedFromRV
+        soldierSelectedCallbacks = context as SoldierSelectedFromRV?
+        signedItemsCallbacks = context as SoldierSignedItemsCallbacks?
     }
 
     override fun onDetach() {
@@ -88,6 +96,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
         buttonCallbacks = null
         soldierCallbacks = null
         soldierSelectedCallbacks = null
+        signedItemsCallbacks = null
     }
 
 
@@ -111,6 +120,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
             commandersButton = findViewById(R.id.commandersButton)
             allSoldiersButton = findViewById(R.id.allSoldiersButton)
             powerListButton = findViewById(R.id.powerListButton)
+            signedItemsButton = findViewById(R.id.signedItemsButton)
             operationalListButton =    findViewById(R.id.operationalButton)
             searchView = findViewById(R.id.soldierSearchView)
             amountOfSoldiersPresentTV = findViewById(R.id.amountOfSoldiersPresent)
@@ -119,6 +129,7 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
             searchList = findViewById(R.id.activitiesSearchListView)
             noItemsFoundIV = findViewById(R.id.noItemsFoundImage)
             soldiersProgressBar = findViewById(R.id.soldiersProgressBar)
+
             searchView.queryHint = "חפש חייל";
         }
 
@@ -157,6 +168,9 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
                 soldierCallbacks!!,
                 soldierSelectedCallbacks!!
             ) }
+            signedItemsButton.setOnClickListener{
+                signedItemsCallbacks!!.onSignedItemsSelected()
+            }
         }
 
     }
@@ -181,8 +195,6 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
         }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(text: String?): Boolean {
-
-                goToSoldier(soldierHashMap,text!!)
 
                 return false
             }
@@ -262,6 +274,13 @@ class MainSoldiersFragment(var commandPath: String):Fragment() {
                     updateUI()
                 }
             }
+        })
+
+        soldiersViewModel.gotSoldiers.observe(viewLifecycleOwner, Observer {
+            commandersButton.isEnabled = it
+            allSoldiersButton.isEnabled = it
+            powerListButton.isEnabled = it
+            operationalListButton.isEnabled = it
         })
     }
 

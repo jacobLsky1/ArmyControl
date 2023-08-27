@@ -16,8 +16,15 @@ import com.jacoblip.andriod.armycontrol.utilities.AddingSoldierHelper
 class AddSoldierToDayAdapter(var context: Context, var allSolders:List<Soldier>, var checkEveryOne:Boolean, var addToActivity:Boolean,var existingSoldiers:List<String>?):BaseAdapter() {
 
     private val inflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-
-    override fun getCount() = allSolders.size
+    var soldiersChecked = mutableListOf<Int>()
+    override fun getCount():Int{
+        if(checkEveryOne){
+            for(i in 0 until allSolders.size){
+                soldiersChecked.add(i)
+            }
+        }
+        return allSolders.size
+    }
 
     override fun getItem(p0: Int): Any {
        return allSolders[p0]
@@ -27,8 +34,8 @@ class AddSoldierToDayAdapter(var context: Context, var allSolders:List<Soldier>,
         return p0.toLong()
     }
 
-    override fun getView(p0: Int, p1: View?, parent: ViewGroup?): View {
-        var soldier = getItem(p0) as Soldier
+    override fun getView(position: Int, p1: View?, parent: ViewGroup?): View {
+        var soldier = getItem(position) as Soldier
         val view = inflater.inflate(R.layout.a_item_soldier_for_day, parent, false)
         view.apply {
             val nameCB = findViewById<CheckBox>(R.id.nameCheckBox)
@@ -55,7 +62,7 @@ class AddSoldierToDayAdapter(var context: Context, var allSolders:List<Soldier>,
             }
 
             if(existingSoldiers==null)
-            nameCB.isChecked = checkEveryOne
+            nameCB.isChecked = soldiersChecked.contains(position)
             else{
                 for(mySoldier in existingSoldiers!!){
                     if(soldier.idNumber==mySoldier){
@@ -65,8 +72,10 @@ class AddSoldierToDayAdapter(var context: Context, var allSolders:List<Soldier>,
             }
             nameCB.setOnCheckedChangeListener{it,isChecked->
                 if(isChecked){
+                    soldiersChecked.add(position)
                     AddingSoldierHelper.soldiersToAdd.add(soldier.idNumber)
                 }else{
+                    soldiersChecked.remove(position)
                     AddingSoldierHelper.soldiersToAdd.remove(soldier.idNumber)
                 }
             }

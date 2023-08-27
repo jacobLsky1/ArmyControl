@@ -26,18 +26,29 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/deleteSoldierButton"
+        app:layout_constraintTop_toBottomOf="@+id/addToActivityButton"
         />
 
     <Button
-        android:id="@+id/deleteSoldierButton"
+    android:id="@+id/deleteSoldierButton"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:text="הסר חיילים"
+    android:visibility="gone"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/tool_bar" />
+
+    <Button
+        android:id="@+id/addToActivityButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="הסר חיילים"
+        android:text="הוסף חיילים לפעילות"
         android:visibility="gone"
+        android:layout_marginTop="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tool_bar" />
+        app:layout_constraintTop_toBottomOf="@id/deleteSoldierButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

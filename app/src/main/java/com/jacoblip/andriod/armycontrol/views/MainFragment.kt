@@ -40,7 +40,7 @@ class MainFragment(commandPath: String):Fragment() {
     lateinit var addActivityFAB:ExtendedFloatingActionButton
     var soldiersFragment:Fragment = MainSoldiersFragment.newInstance(commandPath)
     var activiteiesFragment:Fragment = MainActivitiesFragment.newInstance(commandPath)
-    var fragmentReady:MutableLiveData<Boolean> = MutableLiveData()
+    var fragmentReady = false
     var fabClicked:Boolean = false
     lateinit var soldiersViewModel:SoldiersViewModel
 
@@ -86,20 +86,24 @@ class MainFragment(commandPath: String):Fragment() {
             bottomNavigationView.setOnNavigationItemSelectedListener {
                 when(it.itemId){
                     R.id.personnelTab -> {
-                        Util.inActivitiesFragment = false
-                        childFragmentManager
+                        if(fragmentReady) {
+                            Util.inActivitiesFragment = false
+                            childFragmentManager
                                 .beginTransaction()
                                 .replace(R.id.secondary_fragment_container, soldiersFragment)
                                 .addToBackStack(null)
                                 .commit()
+                        }
                     }
                     R.id.timeLineTab -> {
-                        Util.inActivitiesFragment = true
-                        childFragmentManager
+                        if(fragmentReady) {
+                            Util.inActivitiesFragment = true
+                            childFragmentManager
                                 .beginTransaction()
                                 .replace(R.id.secondary_fragment_container, activiteiesFragment)
                                 .addToBackStack(null)
                                 .commit()
+                        }
                     }
                 }
                 true
@@ -123,17 +127,18 @@ class MainFragment(commandPath: String):Fragment() {
 
     }
    private fun setUpObservers(){
-        fragmentReady.observe(viewLifecycleOwner, Observer {
-            if (it) {
 
-            }
-        })
+       soldiersViewModel.gotSoldiers.observe(viewLifecycleOwner, Observer {
+           addFAB.isEnabled = it
+           fragmentReady = it
+           bottomNavigationView.selectedItemId = R.id.personnelTab
+       })
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setClickEvents()
-        fragmentReady.postValue(true)
     }
 
 
@@ -142,12 +147,20 @@ class MainFragment(commandPath: String):Fragment() {
             onAddFabClicked()
         }
         addSoldierFAB.setOnClickListener {
+            if(Util.userCommandPath=="1") {
             createSoldierDialog()
+            }else{
+                Toast.makeText(requireContext(), "רק מפקד פלוגה יכול להוסיף חייל", Toast.LENGTH_LONG).show()
+            }
             onAddFabClicked()
         }
         addActivityFAB.setOnClickListener {
-            addActivityCallback?.addActivity()
-            onAddFabClicked()
+            if(Util.userCommandPath.length<=3) {
+                addActivityCallback?.addActivity()
+                onAddFabClicked()
+            }else{
+                Toast.makeText(requireContext(), "רק מפ או ממ יכול להוסיף פעילות", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -180,42 +193,60 @@ class MainFragment(commandPath: String):Fragment() {
            dialog.dismiss()
        }
        addSoldierButton.setOnClickListener {
-           var inputCorrect = true
-           var name = nameInputText.text.toString().trim()
-           var idNumber = idNumberInputText.text.toString().trim()
-           var phone = phoneNumberInputText.text.toString().trim()
-           var job = civilianJobInputText.text.toString().trim()
-           var position = positionSpinner.selectedItem.toString()
-           var armyJob = armyJobSpinner.selectedItem.toString()
 
-           if (TextUtils.isEmpty(name) || TextUtils.isEmpty(idNumber) || TextUtils.isEmpty(phone)) {
-               inputCorrect = false
-               if (TextUtils.isEmpty(name)) {
-                   nameInputText.error = "נא למלא את השדא"
+               var inputCorrect = true
+               var name = nameInputText.text.toString().trim()
+               var idNumber = idNumberInputText.text.toString().trim()
+               var phone = phoneNumberInputText.text.toString().trim()
+               var job = civilianJobInputText.text.toString().trim()
+               var position = positionSpinner.selectedItem.toString()
+               var armyJob = armyJobSpinner.selectedItem.toString()
+
+               if (TextUtils.isEmpty(name) || TextUtils.isEmpty(idNumber) || TextUtils.isEmpty(phone)) {
+                   inputCorrect = false
+                   if (TextUtils.isEmpty(name)) {
+                       nameInputText.error = "נא למלא את השדא"
+                   }
+                   if (TextUtils.isEmpty(idNumber)) {
+                       idNumberInputText.error = "נא למלא את השדא"
+                   }
+                   if (TextUtils.isEmpty(phone)) {
+                       phoneNumberInputText.error = "נא למלא את השדא"
+                   }
+                   vibrateAlert()
                }
-               if (TextUtils.isEmpty(idNumber)) {
-                   idNumberInputText.error = "נא למלא את השדא"
+
+               if (inputCorrect) {
+                   var armyJob = Util.getArmyJobPosition(armyJob)
+                   var soldierPosition = Util.getSoldierArmyPosition(position)
+                   var isCommander = (armyJob != "")
+                   var isLieutenant = if (isCommander) {
+                       armyJob[0] == '-'
+                   } else false
+
+                   var soldier = Soldier(
+                       name,
+                       idNumber,
+                       "",
+                       "",
+                       false,
+                       "",
+                       listOf(),
+                       phone,
+                       job,
+                       armyJob,
+                       soldierPosition,
+                       "",
+                       isCommander,
+                       isLieutenant,
+                       listOf(),
+                       listOf()
+                   )
+
+                   soldiersViewModel.addSoldier(soldier)
+                   dialog.dismiss()
                }
-               if (TextUtils.isEmpty(phone)) {
-                   phoneNumberInputText.error = "נא למלא את השדא"
-               }
-               vibrateAlert()
-           }
 
-           if (inputCorrect) {
-               var armyJob = Util.getArmyJobPosition(armyJob)
-               var soldierPosition = Util.getSoldierArmyPosition(position)
-               var isCommander = (armyJob != "")
-               var isLieutenant = if (isCommander) {
-                   armyJob[0] == '-'
-               } else false
-
-               var soldier = Soldier(name, idNumber, "", "", false, "",
-                       listOf(), phone, job, armyJob, soldierPosition, "",isCommander, isLieutenant, listOf(), listOf())
-
-               soldiersViewModel.addSoldier(soldier)
-               dialog.dismiss()
-           }
        }
    }
 
@@ -237,12 +268,12 @@ class MainFragment(commandPath: String):Fragment() {
                     .alpha(1f)
                     .setDuration(400)
                     .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationStart(animation: Animator?) {
+                        override fun onAnimationStart(animation: Animator) {
                             super.onAnimationStart(animation)
                             addSoldierFAB.isVisible = true
                         }
 
-                        override fun onAnimationEnd(animation: Animator?) {
+                        override fun onAnimationEnd(animation: Animator) {
                             super.onAnimationEnd(animation)
                             addSoldierFAB.extend()
                         }
@@ -254,12 +285,12 @@ class MainFragment(commandPath: String):Fragment() {
                     .setDuration(400)
                     .setListener(object : AnimatorListenerAdapter() {
 
-                        override fun onAnimationStart(animation: Animator?) {
+                        override fun onAnimationStart(animation: Animator) {
                             super.onAnimationStart(animation)
                             addActivityFAB.isVisible = true
                         }
 
-                        override fun onAnimationEnd(animation: Animator?) {
+                        override fun onAnimationEnd(animation: Animator) {
                             super.onAnimationEnd(animation)
                             addActivityFAB.extend()
                         }
@@ -271,12 +302,12 @@ class MainFragment(commandPath: String):Fragment() {
                     .alpha(0f)
                     .setDuration(400)
                     .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationStart(animation: Animator?) {
+                        override fun onAnimationStart(animation: Animator) {
                             super.onAnimationStart(animation)
                             addSoldierFAB.shrink()
                         }
 
-                        override fun onAnimationEnd(animation: Animator?) {
+                        override fun onAnimationEnd(animation: Animator) {
                             super.onAnimationEnd(animation)
                             addSoldierFAB.isVisible = false
                         }
@@ -287,12 +318,12 @@ class MainFragment(commandPath: String):Fragment() {
                     .alpha(0f)
                     .setDuration(400)
                     .setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationStart(animation: Animator?) {
+                        override fun onAnimationStart(animation: Animator) {
                             super.onAnimationStart(animation)
                             addActivityFAB.shrink()
                         }
 
-                        override fun onAnimationEnd(animation: Animator?) {
+                        override fun onAnimationEnd(animation: Animator) {
                             super.onAnimationEnd(animation)
                             addActivityFAB.isVisible = false
                         }

@@ -11,8 +11,6 @@ import android.widget.Switch
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.ddd.androidutils.DoubleClick
-import com.ddd.androidutils.DoubleClickListener
 import com.jacoblip.andriod.armycontrol.R
 import com.jacoblip.andriod.armycontrol.data.models.Soldier
 import com.jacoblip.andriod.armycontrol.utilities.Util
@@ -22,6 +20,7 @@ import com.jacoblip.andriod.armycontrol.views.soldiers.RVSoldiersFragment
 class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: MainSoldiersFragment.SoldierCallbacks?, var soldierSelectedCallbacks: MainSoldiersFragment.SoldierSelectedFromRV?,var soldierAtedCallback:RVSoldiersFragment.SoldierArrivingCallbacks?):RecyclerView.Adapter<SoldierItemViewHolder>() {
 
     var listOfSoldiers:MutableList<Soldier> = mutableListOf()
+    var listOfCheckedSoldiers:MutableList<String> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoldierItemViewHolder {
         when(viewType){
@@ -51,6 +50,7 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
             Linkify.addLinks(phoneTV, Linkify.PHONE_NUMBERS);
             phoneTV.linksClickable = true;
             stationMapTV.text = Util.getPositionByCode(soldier.positionMap)
+            checkedImageView.isVisible = listOfCheckedSoldiers.contains(soldiers[position].idNumber)
 
             if(soldier.isCommander){
                 icon.setBackgroundResource(R.drawable.commander_pic);
@@ -61,11 +61,18 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
             hasSoldierArrivedButton.text = if(soldier.hasArrived)"נמצא" else "לא נמצא"
             hasSoldierArrivedButton.setTextColor(if(soldier.hasArrived)Color.GREEN else Color.RED)
             hasSoldierArrivedButton.setOnClickListener {
-                var newSodiler = soldier
-                newSodiler.hasArrived = !soldier.hasArrived
-                hasSoldierArrivedButton.text = if(newSodiler.hasArrived)"נמצא" else "לא נמצא"
-                hasSoldierArrivedButton.setTextColor(if(newSodiler.hasArrived)Color.GREEN else Color.RED)
-                soldierAtedCallback!!.soldierAttendantsChange(soldier,newSodiler)
+                var soldierOld = Soldier(soldier.name,soldier.idNumber,soldier.age,soldier.medicalProblems,soldier.hasArrived,soldier.whyNotArriving,soldier.listOfDatesInService,soldier.phoneNumber,soldier.civilianJob,soldier.armyJobMap,soldier.positionMap,soldier.entryCode,soldier.isCommander,soldier.isLieutenant,soldier.pakal,soldier.Activates)
+                var soldierNew = Soldier(soldier.name,soldier.idNumber,soldier.age,soldier.medicalProblems,!soldier.hasArrived,soldier.whyNotArriving,soldier.listOfDatesInService,soldier.phoneNumber,soldier.civilianJob,soldier.armyJobMap,soldier.positionMap,soldier.entryCode,soldier.isCommander,soldier.isLieutenant,soldier.pakal,soldier.Activates)
+                soldier.hasArrived = !soldier.hasArrived
+                hasSoldierArrivedButton.text = if(soldier.hasArrived)"נמצא" else "לא נמצא"
+                hasSoldierArrivedButton.setTextColor(if(soldier.hasArrived)Color.GREEN else Color.RED)
+                if(Util.listOfOldSoldiersUpdatedByIsPresent.contains(soldierOld)){
+                    Util.listOfOldSoldiersUpdatedByIsPresent.remove(soldierOld)
+                    Util.listOfNewSoldiersUpdatedByIsPresent.remove(soldierNew)
+                }else{
+                    Util.listOfOldSoldiersUpdatedByIsPresent.add(soldierOld)
+                    Util.listOfNewSoldiersUpdatedByIsPresent.add(soldierNew)
+                }
             }
 
             if(callbacks!=null&&soldierSelectedCallbacks!=null) {
@@ -75,6 +82,7 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
                         soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier, true)
                         checkedImageView.visibility = View.VISIBLE
                         listOfSoldiers.add(soldier)
+                        listOfCheckedSoldiers.add(soldier.idNumber)
                     }
                     true
                 }
@@ -86,6 +94,7 @@ class SoldiersAllSoldiersAdapter(var soldiers: List<Soldier>, var callbacks: Mai
                             checkedImageView.visibility = View.VISIBLE
                         } else {
                             listOfSoldiers.remove(soldier)
+                            listOfCheckedSoldiers.remove(soldier.idNumber)
                             soldierSelectedCallbacks!!.onSoldierSelectedFromRV(soldier, false)
                             checkedImageView.visibility = View.GONE
                         }

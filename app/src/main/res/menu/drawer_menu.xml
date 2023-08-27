@@ -4,12 +4,25 @@
         android:title="הוסף חיילים מאקסל"
         android:icon="@drawable/add_soldiers_csv" />
 
-    <item android:id="@+id/soldierAppInfo"
-        android:title="מידע על האפליקציה"
+    <item android:id="@+id/soldierAppHelper"
+        android:title="הדרכה על האפליקציה"
         android:icon="@drawable/app_info" />
 
+    <item android:id="@+id/soldierAppInfo"
+        android:title="מידע על האפליקציה"
+        android:icon="@drawable/baseline_info_24" />
+
+    <item android:id="@+id/shareApp"
+        android:title="שתף את האפליקציה"
+        android:icon="@drawable/baseline_share_24" />
+
+
+    <item android:id="@+id/rateApp"
+        android:title="דרג את האפליקציה"
+        android:icon="@drawable/baseline_star_rate_24" />
+
     <item android:id="@+id/switchUserButton"
-        android:title="התנתק"
+        android:title="החלף משתמש"
         android:icon="@drawable/ic_switch_24"
         />
 

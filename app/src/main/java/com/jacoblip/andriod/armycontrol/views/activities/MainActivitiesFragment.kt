@@ -260,8 +260,6 @@ class MainActivitiesFragment(var commandPath: String):Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(text: String?): Boolean {
 
-                goToSoldier(activityHashMap, text!!)
-
                 return false
             }
 

@@ -2,4 +2,8 @@
     <string name="app_name">פיקוד ושליטה</string>
     <string name="open">פתח</string>
     <string name="close">סגור</string>
+    <string name="sample_company_description">פיקוד ושליטה היא אפליקצית עזר למפקד לארגן את המסגרת שלו ולהקל על משימות הפיקוד</string>
+    <string name="sample_company_name">פיקוד ושליטה</string>
+    <string name="connect_with_us">לכל בעיה או שאלה מוזמנים לפנות במייל</string>
+    <string name="copyright_footer">\u00A9 יעקב ליפסקי 2023</string>
 </resources>

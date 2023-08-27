@@ -21,3 +21,15 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class com.jacoblip.andriod.armycontrol.data.models.* { *; }
+# Apache POI
+-keep class org.apache.poi.** { *; }
+-dontwarn org.apache.poi.**
+
+# For using newer Excel formats, add these lines
+-keep class org.apache.xmlbeans.** { *; }
+-dontwarn org.apache.xmlbeans.**
+-keep class org.openxmlformats.** { *; }
+-keep public class com.google.firebase.** {*;}
+-keep class com.google.** {*;}
+-keep class com.google.android.gms.internal.** {*;}
+-keepclasseswithmembers class com.google.firebase.FirebaseException

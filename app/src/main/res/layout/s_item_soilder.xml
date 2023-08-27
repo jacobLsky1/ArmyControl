@@ -83,10 +83,10 @@
                 android:id="@+id/amountOfActivitiesPassedTV"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_margin="10dp"
+                android:layout_margin="15dp"
                 android:gravity="center"
                 android:text="TextView"
-                android:textSize="18dp"
+                android:textSize="14dp"
                 android:padding="10dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -112,7 +112,7 @@
                 android:layout_marginEnd="8dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/checkedImageView"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

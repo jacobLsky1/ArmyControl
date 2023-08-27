@@ -6,6 +6,8 @@ data class Group(
     var groupType: GroupType = GroupType.פלוגה,
     var groupName: String =  "פלוגה ב" ,
     var subGroups:List<Group>? = listOf(),
-    var amountOfSoldiers:Int = 0
+    var amountOfSoldiers:Int = 0,
+    var createdAt: String = "",
+    var createdBy: String = ""
 ) {
 }
